@@ -6,9 +6,10 @@ import { findNearestEvent } from "@/lib/aggregator";
 import { EventCard } from "@/components/EventCard";
 import { StatsCards } from "@/components/StatsCards";
 import { WaitingRoomGrid } from "@/components/WaitingRoomGrid";
+import EventSelectSheet from "@/components/EventSelectSheet";
+
 import {
   Banner,
-  BannerAction,
   BannerClose,
   BannerIcon,
   BannerTitle,
@@ -16,7 +17,6 @@ import {
 import { CircleAlert } from 'lucide-react';
 
 import "./index.css";
-import type { WaitingRooms } from "./api/fortunemusic/waitingRooms";
 
 
 
@@ -101,12 +101,13 @@ export function App() {
   }, []);
 
   // Function to refresh only waiting rooms data
-  const refreshWaitingRooms = async () => {
-    if (!selectedSession || loading) return;
+  const refreshWaitingRooms = async (sessionId?: number) => {
+    const targetSessionId = sessionId || selectedSession?.id;
+    if (!targetSessionId) return;
 
     try {
       console.log("Refreshing waiting rooms at:", new Date());
-      const wr = await fetchWaitingRooms(selectedSession.id);
+      const wr = await fetchWaitingRooms(targetSessionId);
 
       if (wr.message) {
         setNotice(wr.message)
@@ -125,6 +126,13 @@ export function App() {
     }
   };
 
+  // Fetch waiting rooms when session changes
+  useEffect(() => {
+    if (selectedSession && !loading) {
+      refreshWaitingRooms(selectedSession.id);
+    }
+  }, [selectedSession?.id]);
+
   // Auto-refresh timer for waiting rooms only
   useEffect(() => {
     const checkRefresh = () => {
@@ -139,7 +147,7 @@ export function App() {
   }, [nextRefreshTime, loading, selectedSession]);
 
   return (
-    <div className="container mx-auto p-8 text-center relative z-10">
+    <div className="container w-full mx-auto p-8 text-center relative z-10">
       {error && (
         <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
           <p className="font-semibold">Error loading events:</p>
@@ -162,6 +170,10 @@ export function App() {
           </Banner>
         )
       }
+
+      <EventSelectSheet
+        events={events}
+      />
 
       <EventCard
         name={selectedEvent?.name!}
