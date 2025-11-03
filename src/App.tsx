@@ -50,9 +50,8 @@ export function App() {
 
   let [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   let [nextRefreshTime, setNextRefreshTime] = useState<Date>(new Date(Date.now() + 20 * 1000));
-  let [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Init Events Data
+  // Init Events Data (only once on mount)
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -87,7 +86,6 @@ export function App() {
         setWaitingRooms(wr.waitingRooms);
         console.log("Fetched Waiting Rooms:", wr);
 
-
         // Update refresh times
         setLastUpdate(new Date());
         setNextRefreshTime(new Date(Date.now() + 20 * 1000));
@@ -100,20 +98,45 @@ export function App() {
       }
     };
     loadData();
-  }, [refreshTrigger]);
+  }, []);
 
-  // Auto-refresh timer
+  // Function to refresh only waiting rooms data
+  const refreshWaitingRooms = async () => {
+    if (!selectedSession || loading) return;
+
+    try {
+      console.log("Refreshing waiting rooms at:", new Date());
+      const wr = await fetchWaitingRooms(selectedSession.id);
+
+      if (wr.message) {
+        setNotice(wr.message)
+      } else {
+        setNotice(null);
+      };
+
+      setWaitingRooms(wr.waitingRooms);
+      console.log("Refreshed Waiting Rooms:", wr);
+
+      // Update refresh times
+      setLastUpdate(new Date());
+      setNextRefreshTime(new Date(Date.now() + 20 * 1000));
+    } catch (err) {
+      console.error("Failed to refresh waiting rooms:", err);
+    }
+  };
+
+  // Auto-refresh timer for waiting rooms only
   useEffect(() => {
     const checkRefresh = () => {
       const now = new Date();
       if (now >= nextRefreshTime && !loading) {
-        setRefreshTrigger(prev => prev + 1);
+        refreshWaitingRooms();
       }
     };
 
     const interval = setInterval(checkRefresh, 1000);
     return () => clearInterval(interval);
-  }, [nextRefreshTime, loading]);
+  }, [nextRefreshTime, loading, selectedSession]);
 
   return (
     <div className="container mx-auto p-8 text-center relative z-10">
@@ -161,7 +184,7 @@ export function App() {
         loading={loading}
         onManualRefresh={() => {
           console.log("Manual refresh triggered");
-          setRefreshTrigger(prev => prev + 1);
+          refreshWaitingRooms();
         }}
       />
 
