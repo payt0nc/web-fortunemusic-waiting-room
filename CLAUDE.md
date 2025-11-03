@@ -105,3 +105,30 @@ bun --hot ./index.ts
 ```
 
 For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
+
+## Deployment
+
+### GitHub Actions CI/CD
+
+This project uses GitHub Actions for automated deployment to GitHub Pages.
+
+**Workflow:** `.github/workflows/release.yml`
+
+The workflow automatically:
+
+- Triggers on push to `main` branch
+- Sets up Bun environment
+- Installs dependencies with `bun install`
+- Builds the project with `bun run build`
+- Deploys to GitHub Pages
+
+**Manual deployment:**
+
+```sh
+# Build the project
+bun run build
+
+# Output will be in ./dist directory
+```
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions and CORS handling.
