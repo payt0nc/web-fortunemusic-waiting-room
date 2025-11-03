@@ -1,3 +1,4 @@
+import React from "react"
 import { Button } from "@/components/ui/button"
 import type { Event } from "@/api/fortunemusic/events"
 import {
@@ -12,6 +13,7 @@ import { Calendar } from "lucide-react"
 
 interface EventSelectSheetProps {
     events: Map<number, Event>;
+    onEventSelect?: (event: Event) => void;
 }
 
 function groupEventsByDate(events: Map<number, Event>): Map<string, Event[]> {
@@ -34,11 +36,18 @@ function groupEventsByDate(events: Map<number, Event>): Map<string, Event[]> {
     return grouped;
 }
 
-export default function EventSelectSheet({ events }: EventSelectSheetProps) {
+export default function EventSelectSheet({ events, onEventSelect }: EventSelectSheetProps) {
     const groupedEvents = groupEventsByDate(events);
+    const [open, setOpen] = React.useState(false);
+
+    const handleEventClick = (event: Event) => {
+        onEventSelect?.(event);
+        setOpen(false);
+    };
+
     return (
         <div className="flex justify-start w-full mb-6">
-            <Sheet>
+            <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
                     <Button variant="outline" size="lg" className="gap-2">
                         <Calendar className="h-4 w-4" />
@@ -63,6 +72,7 @@ export default function EventSelectSheet({ events }: EventSelectSheetProps) {
                                     {events.map((event) => (
                                         <button
                                             key={event.id}
+                                            onClick={() => handleEventClick(event)}
                                             className="w-full flex items-start gap-3 p-3 rounded-lg border border-border hover:border-primary hover:bg-accent/50 transition-all text-left group"
                                         >
                                             <div className="mt-1 flex-shrink-0">

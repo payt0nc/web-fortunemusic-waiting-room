@@ -17,6 +17,9 @@ import {
 import { CircleAlert } from 'lucide-react';
 
 import "./index.css";
+import nogizaka46Logo from "./assets/nogizaka46_logo.svg";
+import sakurazaka46Logo from "./assets/sakurazaka46_logo.svg";
+import hinatazaka46Logo from "./assets/hinatazaka46_logo.svg";
 
 
 
@@ -28,6 +31,22 @@ function extractMembers(sessions: Map<number, Session>): Map<string, Member> {
     });
   });
   return members;
+}
+
+// Map artist name to logo URL
+function getArtistLogo(artistName: string): string {
+  const logoMap: Record<string, string> = {
+    '乃木坂46': nogizaka46Logo,
+    '櫻坂46': sakurazaka46Logo,
+    '日向坂46': hinatazaka46Logo,
+  };
+  return logoMap[artistName] || nogizaka46Logo;
+}
+
+// Update background image
+function updateBackgroundImage(logoUrl: string) {
+  // Update CSS custom property with the imported logo URL
+  document.documentElement.style.setProperty('--background-logo', `url("${logoUrl}")`);
 }
 
 
@@ -126,6 +145,15 @@ export function App() {
     }
   };
 
+  // Update background when event changes
+  useEffect(() => {
+    if (selectedEvent) {
+      const logoFileName = getArtistLogo(selectedEvent.artistName);
+      updateBackgroundImage(logoFileName);
+      console.log("Background updated to:", logoFileName);
+    }
+  }, [selectedEvent?.id]);
+
   // Fetch waiting rooms when session changes
   useEffect(() => {
     if (selectedSession && !loading) {
@@ -173,6 +201,18 @@ export function App() {
 
       <EventSelectSheet
         events={events}
+        onEventSelect={(event) => {
+          setSelectedEvent(event);
+          setSessions(event.sessions);
+          setMembers(extractMembers(event.sessions));
+
+          // Select first session of the new event
+          const firstSessionId = event.sessions.keys().next().value;
+          if (firstSessionId) {
+            const firstSession = event.sessions.get(firstSessionId);
+            setSelectedSession(firstSession || null);
+          }
+        }}
       />
 
       <EventCard
