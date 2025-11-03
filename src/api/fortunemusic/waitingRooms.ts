@@ -10,8 +10,11 @@ export interface WaitingRoom {
 }
 
 export async function fetchWaitingRooms(eventID: number): Promise<WaitingRooms> {
-    // Use local proxy in development, direct API or CORS proxy in production
-    const link = "/api/waitingrooms"
+    // Use local proxy in development, CORS proxy for GitHub Pages deployment
+    const isProduction = process.env.NODE_ENV === 'production';
+    const link = isProduction 
+        ? "https://corsproxy.io/?https://meets.fortunemusic.app/lapi/v5/app/dateTimezoneMessages"
+        : "/api/waitingrooms"
 
     try {
         const response = await fetch(link, {

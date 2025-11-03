@@ -85,8 +85,11 @@ interface TicketArray {
 const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46"];
 
 export async function fetchEvents(): Promise<Map<number, Event[]>> {
-    // Use local proxy in development, direct API or CORS proxy in production
-    const link = "/api/events"
+    // Use local proxy in development, CORS proxy for GitHub Pages deployment
+    const isProduction = process.env.NODE_ENV === 'production';
+    const link = isProduction 
+        ? "https://corsproxy.io/?https://api.fortunemusic.app/v1/appGetEventData/"
+        : "/api/events"
 
     try {
         const response = await axios.get(link);
