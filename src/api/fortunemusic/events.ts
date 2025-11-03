@@ -84,20 +84,20 @@ interface TicketArray {
 
 const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46"];
 
-export async function fetchEvents(): Promise<Map<number, Event>> {
+export async function fetchEvents(): Promise<Map<number, Event[]>> {
     // Use local proxy in development, direct API or CORS proxy in production
     const link = "/api/events"
 
     try {
         const response = await axios.get(link);
         const data = response.data;
-        let results: Map<number, Event> = new Map<number, Event>();
+        let results: Map<number, Event[]> = new Map<number, Event[]>();
 
         for (const artist of data.appGetEventResponse.artistArray) {
             if (targetArtistNames.includes(artist.artName)) {
                 let events = flatternEventArray(artist.artName, artist.eventArray);
-                events.forEach((event) => {
-                    results.set(event.id, event);
+                events.forEach((event, id) => {
+                    results.set(id, event);
                 });
             };
         }
@@ -175,10 +175,11 @@ export function flatternTimezoneArray(dateDate: string, timezoneArray: TimeZoneA
     return sessions;
 }
 
-export function flatternEventArray(artistName: string, eventArray: EventArray[]): Map<number, Event> {
-    let events: Map<number, Event> = new Map<number, Event>();
+export function flatternEventArray(artistName: string, eventArray: EventArray[]): Map<number, Event[]> {
+    let eventMap: Map<number, Event[]> = new Map<number, Event[]>();
 
     eventArray.forEach((event) => {
+        let events: Event[] = [];
         let eventName = event.evtName;
         let eventPhotoUrl = event.evtPhotUrl;
         event.dateArray.forEach((date) => {
@@ -191,8 +192,9 @@ export function flatternEventArray(artistName: string, eventArray: EventArray[])
                 date: new Date(date.dateDate),
                 sessions: sessions,
             };
-            events.set(event.evtId, currentEvent);
+            events.push(currentEvent);
         });
+        eventMap.set(event.evtId, events);
     });
-    return events;
+    return eventMap;
 }

@@ -12,32 +12,24 @@ import {
 import { Calendar } from "lucide-react"
 
 interface EventSelectSheetProps {
-    events: Map<number, Event>;
+    events: Map<number, Event[]>;
     onEventSelect?: (event: Event) => void;
 }
 
-function groupEventsByDate(events: Map<number, Event>): Map<string, Event[]> {
-    const grouped = new Map<string, Event[]>();
-
-    // Convert to array and sort by date
-    const sortedEvents = Array.from(events.values()).sort((a, b) =>
-        a.date.getTime() - b.date.getTime()
-    );
-
-    // Group sorted events by date
-    sortedEvents.forEach((event) => {
-        const date = event.date.toDateString();
-        if (!grouped.has(date)) {
-            grouped.set(date, []);
-        }
-        grouped.get(date)!.push(event);
-    });
-
-    return grouped;
-}
 
 export default function EventSelectSheet({ events, onEventSelect }: EventSelectSheetProps) {
-    const groupedEvents = groupEventsByDate(events);
+    const groupedEvents = events.entries().reduce((acc, [_, eventMap]) => {
+        eventMap.forEach((event) => {
+            const eventDate = new Date(event.date);
+            const dateString = eventDate.toDateString();
+            if (!acc.has(dateString)) {
+                acc.set(dateString, []);
+            }
+            acc.get(dateString)!.push(event);
+        });
+        return acc;
+    }, new Map<string, Event[]>());
+
     const [open, setOpen] = React.useState(false);
 
     const handleEventClick = (event: Event) => {
@@ -54,14 +46,14 @@ export default function EventSelectSheet({ events, onEventSelect }: EventSelectS
                         Select Event
                     </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-full sm:max-w-md">
-                    <SheetHeader className="space-y-2">
+                <SheetContent side="left" className="w-full sm:max-w-md flex flex-col">
+                    <SheetHeader className="space-y-2 flex-shrink-0">
                         <SheetTitle className="text-2xl">Select an Event</SheetTitle>
                         <SheetDescription>
                             Choose from upcoming events to view waiting room information
                         </SheetDescription>
                     </SheetHeader>
-                    <div className="mt-8 space-y-6">
+                    <div className="mt-8 space-y-6 overflow-y-auto flex-1 pr-2">
                         {Array.from(groupedEvents.entries()).map(([date, events]) => (
                             <div key={date} className="space-y-3">
                                 <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground border-b pb-2">

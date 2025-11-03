@@ -55,7 +55,7 @@ export function App() {
   let [loading, setLoading] = useState(true);
   let [error, setError] = useState<string | null>(null);
 
-  let [events, setEvents] = useState<Map<number, Event>>(new Map());
+  let [events, setEvents] = useState<Map<number, Event[]>>(new Map());
   let [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   let [sessions, setSessions] = useState<Map<number, Session>>(new Map());
@@ -206,7 +206,7 @@ export function App() {
           setSessions(event.sessions);
           setMembers(extractMembers(event.sessions));
 
-          // Select first session of the new event
+
           const firstSessionId = event.sessions.keys().next().value;
           if (firstSessionId) {
             const firstSession = event.sessions.get(firstSessionId);
@@ -222,12 +222,12 @@ export function App() {
 
       <SessionSelector
         id={selectedSession?.id || null}
-        sessions={events.get(selectedEvent?.id || 0)?.sessions || new Map()}
+        sessions={sessions}
         onEventSelect={(eventId: number) => {
           setSelectedSession(sessions.get(eventId) || null);
           console.log("Selected Event ID:", eventId);
         }}
-      ></SessionSelector>
+      />
 
       <StatsCards
         session={selectedSession!}
