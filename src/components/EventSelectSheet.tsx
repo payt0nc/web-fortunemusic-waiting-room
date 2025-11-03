@@ -23,12 +23,17 @@ export default function EventSelectSheet({ events, onEventSelect }: EventSelectS
             const eventDate = new Date(event.date);
             const dateString = eventDate.toDateString();
             if (!acc.has(dateString)) {
-                acc.set(dateString, []);
+                acc.set(dateString, { date: eventDate, events: [] });
             }
-            acc.get(dateString)!.push(event);
+            acc.get(dateString)!.events.push(event);
         });
         return acc;
-    }, new Map<string, Event[]>());
+    }, new Map<string, { date: Date; events: Event[] }>());
+
+    // Sort dates chronologically
+    const sortedDateEntries = Array.from(groupedEvents.entries()).sort(([_a, groupA], [_b, groupB]) => {
+        return groupA.date.getTime() - groupB.date.getTime();
+    });
 
     const [open, setOpen] = React.useState(false);
 
@@ -54,11 +59,11 @@ export default function EventSelectSheet({ events, onEventSelect }: EventSelectS
                         </SheetDescription>
                     </SheetHeader>
                     <div className="mt-8 space-y-6 overflow-y-auto flex-1 pr-2">
-                        {Array.from(groupedEvents.entries()).map(([date, events]) => (
-                            <div key={date} className="space-y-3">
+                        {sortedDateEntries.map(([dateString, { events }]) => (
+                            <div key={dateString} className="space-y-3">
                                 <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground border-b pb-2">
                                     <Calendar className="h-4 w-4" />
-                                    {date}
+                                    {dateString}
                                 </div>
                                 <div className="space-y-2 pl-2">
                                     {events.map((event) => (
