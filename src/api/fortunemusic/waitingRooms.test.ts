@@ -7,6 +7,7 @@ test("fetchWaitingRooms - should fetch and parse waiting rooms successfully", as
         message: "Success",
         timezones: [
             {
+                e_id: "e12345",
                 members: {
                     "TICKET001": {
                         totalCount: 5,
@@ -19,6 +20,7 @@ test("fetchWaitingRooms - should fetch and parse waiting rooms successfully", as
                 }
             },
             {
+                e_id: "e12345",
                 members: {
                     "TICKET003": {
                         totalCount: 10,
@@ -46,11 +48,11 @@ test("fetchWaitingRooms - should fetch and parse waiting rooms successfully", as
     // Verify fetch was called with correct parameters
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
-        "https://meets.fortunemusic.app/lapi/v5/app/dateTimezoneMessages",
+        "/api/waitingrooms",
         {
             method: "POST",
             headers: {
-                'Host': 'meets.fortunemusic.app',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({ "eventId": "e12345" })
         }
@@ -59,22 +61,27 @@ test("fetchWaitingRooms - should fetch and parse waiting rooms successfully", as
     // Verify the result structure
     expect(result.message).toBe("2025-11-03");
     expect(result.waitingRooms).toBeInstanceOf(Map);
-    expect(result.waitingRooms.size).toBe(3);
+    expect(result.waitingRooms.size).toBe(1); // One event ID (12345)
+
+    // Get the rooms for event 12345
+    const rooms = result.waitingRooms.get(12345);
+    expect(rooms).toBeDefined();
+    expect(rooms?.length).toBe(3); // 3 total rooms across both timezones
 
     // Verify individual waiting room entries
-    const ticket001 = result.waitingRooms.get("TICKET001");
+    const ticket001 = rooms?.find(r => r.ticketCode === "TICKET001");
     expect(ticket001).toBeDefined();
     expect(ticket001?.ticketCode).toBe("TICKET001");
     expect(ticket001?.peopleCount).toBe(5);
     expect(ticket001?.waitingTime).toBe(120);
 
-    const ticket002 = result.waitingRooms.get("TICKET002");
+    const ticket002 = rooms?.find(r => r.ticketCode === "TICKET002");
     expect(ticket002).toBeDefined();
     expect(ticket002?.ticketCode).toBe("TICKET002");
     expect(ticket002?.peopleCount).toBe(3);
     expect(ticket002?.waitingTime).toBe(60);
 
-    const ticket003 = result.waitingRooms.get("TICKET003");
+    const ticket003 = rooms?.find(r => r.ticketCode === "TICKET003");
     expect(ticket003).toBeDefined();
     expect(ticket003?.ticketCode).toBe("TICKET003");
     expect(ticket003?.peopleCount).toBe(10);
@@ -108,6 +115,7 @@ test("fetchWaitingRooms - should handle timezones with empty members", async () 
         message: "Success",
         timezones: [
             {
+                e_id: "e12345",
                 members: {}
             }
         ],
@@ -126,5 +134,10 @@ test("fetchWaitingRooms - should handle timezones with empty members", async () 
     const result = await fetchWaitingRooms(12345);
 
     expect(result.message).toBe("2025-11-03");
-    expect(result.waitingRooms.size).toBe(0);
+    expect(result.waitingRooms.size).toBe(1);
+
+    // Should have event 12345 with an empty array
+    const rooms = result.waitingRooms.get(12345);
+    expect(rooms).toBeDefined();
+    expect(rooms?.length).toBe(0);
 });

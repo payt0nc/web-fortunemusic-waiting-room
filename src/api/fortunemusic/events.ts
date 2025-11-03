@@ -1,16 +1,20 @@
+import axios from "axios";
+
 export interface Event {
     id: number;
-    artist: string;
     name: string;
+    artistName: string;
     photoUrl: string;
+    date: Date;
     sessions: Map<number, Session>;
 }
 
 export interface Session {
     id: number;
     name: string;
-    startTime: string;
-    endTime: string;
+    sessionName: string;
+    startTime: Date;
+    endTime: Date;
     members: Map<string, Member>;
 }
 
@@ -81,30 +85,36 @@ interface TicketArray {
 const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46"];
 
 export async function fetchEvents(): Promise<Map<number, Event>> {
-    const link = "https://api.fortunemusic.app/v1/appGetEventData"
-    const response = await fetch(link, {
-        method: "GET",
-    });
+    // Use local proxy in development, direct API or CORS proxy in production
+    const link = "/api/events"
 
-    const data = await response.json();
-    let events: Map<number, Event> = new Map<number, Event>();
-    for (const artist of data.appGetEventResponse.artistArray) {
-        // if artist name in targetArtistNames
-        if (targetArtistNames.includes(artist.artName)) {
-            artist.eventArray.forEach((event: EventArray) => {
-                events.set(event.evtId, {
-                    id: event.evtId,
-                    artist: artist.artName,
-                    name: event.evtName,
-                    photoUrl: event.evtPhotUrl,
-                    sessions: flatternDateArrayAsSession(event.dateArray),
+    try {
+        const response = await axios.get(link);
+        const data = response.data;
+        let results: Map<number, Event> = new Map<number, Event>();
+
+        for (const artist of data.appGetEventResponse.artistArray) {
+            if (targetArtistNames.includes(artist.artName)) {
+                let events = flatternEventArray(artist.artName, artist.eventArray);
+                events.forEach((event) => {
+                    results.set(event.id, event);
                 });
-            });
+            };
         }
-    }
+        return results;
 
-    return events;
+    } catch (error) {
+        console.error("Error fetching events:", error);
+        if (axios.isAxiosError(error)) {
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Network error: Unable to connect to FortuneMusic API. This may be due to CORS restrictions.');
+            }
+            throw new Error(`API error: ${error.response?.status || 'Unknown'} - ${error.message}`);
+        }
+        throw new Error(`Failed to fetch sessions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
+
 
 export function concatEventTime(dt: string, t: string): Date {
     let datetime = new Date(dt);
@@ -147,20 +157,42 @@ export function flatternMemberArray(memberArray: MemberArray[]): Map<string, Mem
     return membersMap;
 }
 
-export function flatternDateArrayAsSession(dateArray: DateArray[]): Map<number, Session> {
-    let sessionsMap: Map<number, Session> = new Map<number, Session>();
-    dateArray.forEach((date) => {
-        date.timeZoneArray.forEach((timezone) => {
-            let startAt = concatEventTime(date.dateDate, timezone.tzStart);
-            let endAt = concatEventTime(date.dateDate, timezone.tzEnd);
-            sessionsMap.set(timezone.tzId, {
-                id: timezone.tzId,
-                name: timezone.tzName,
-                startTime: startAt.toISOString(),
-                endTime: endAt.toISOString(),
-                members: flatternMemberArray(timezone.memberArray),
-            })
+export function flatternTimezoneArray(dateDate: string, timezoneArray: TimeZoneArray[]): Map<number, Session> {
+    let sessions: Map<number, Session> = new Map<number, Session>();
+    timezoneArray.forEach((timezone) => {
+        let startAt = concatEventTime(dateDate, timezone.tzStart);
+        let endAt = concatEventTime(dateDate, timezone.tzEnd);
+        let session: Session = {
+            id: timezone.tzId,
+            name: timezone.tzName,
+            sessionName: timezone.tzName,
+            startTime: startAt,
+            endTime: endAt,
+            members: flatternMemberArray(timezone.memberArray),
+        }
+        sessions.set(timezone.tzId, session);
+    });
+    return sessions;
+}
+
+export function flatternEventArray(artistName: string, eventArray: EventArray[]): Map<number, Event> {
+    let events: Map<number, Event> = new Map<number, Event>();
+
+    eventArray.forEach((event) => {
+        let eventName = event.evtName;
+        let eventPhotoUrl = event.evtPhotUrl;
+        event.dateArray.forEach((date) => {
+            let sessions = flatternTimezoneArray(date.dateDate, date.timeZoneArray);
+            let currentEvent: Event = {
+                id: event.evtId,
+                name: eventName,
+                artistName: artistName,
+                photoUrl: eventPhotoUrl,
+                date: new Date(date.dateDate),
+                sessions: sessions,
+            };
+            events.set(event.evtId, currentEvent);
         });
     });
-    return sessionsMap;
+    return events;
 }

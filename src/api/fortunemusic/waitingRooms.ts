@@ -1,6 +1,6 @@
 export interface WaitingRooms {
     message: string;
-    waitingRooms: Map<string, WaitingRoom>;
+    waitingRooms: Map<number, WaitingRoom[]>;
 }
 
 export interface WaitingRoom {
@@ -10,31 +10,49 @@ export interface WaitingRoom {
 }
 
 export async function fetchWaitingRooms(eventID: number): Promise<WaitingRooms> {
-    const link = "https://meets.fortunemusic.app/lapi/v5/app/dateTimezoneMessages"
-    const response = await fetch(link, {
-        method: "POST",
-        headers: {
-            'Host': 'meets.fortunemusic.app',
-        },
-        body: JSON.stringify({ "eventId": "e" + eventID })
-    });
+    // Use local proxy in development, direct API or CORS proxy in production
+    const link = "/api/waitingrooms"
 
-    let resp: any = await response.json();
-    let waitingRooms: WaitingRooms = flatternWaitingRooms(resp);
-    return waitingRooms;
+    try {
+        const response = await fetch(link, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ "eventId": "e" + eventID })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch waiting rooms: ${response.status} ${response.statusText}`);
+        }
+
+        let resp: any = await response.json();
+        let waitingRooms: WaitingRooms = flattenWaitingRooms(resp);
+        return waitingRooms;
+    } catch (error) {
+        console.error("Error fetching waiting rooms:", error);
+        throw new Error(`Failed to fetch waiting rooms: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
 
-function flatternWaitingRooms(data: any): WaitingRooms {
-    let waitingRooms: Map<string, WaitingRoom> = new Map<string, WaitingRoom>();
+function flattenWaitingRooms(data: any): WaitingRooms {
+    let waitingRooms: Map<number, WaitingRoom[]> = new Map<number, WaitingRoom[]>();
     data.timezones.forEach((timezone: any) => {
+        let eventIDStr = timezone.e_id as string;
+        let eventID = +(eventIDStr.slice(1)) as number;
+
+        // Get existing rooms for this event ID or create a new array
+        let rooms: WaitingRoom[] = waitingRooms.get(eventID) || [];
+
         Object.keys(timezone.members).forEach((key) => {
             const memberInfo = timezone.members[key];
-            waitingRooms.set(key, {
+            rooms.push({
                 ticketCode: key,
                 peopleCount: memberInfo.totalCount,
                 waitingTime: memberInfo.totalWait,
             });
         });
+        waitingRooms.set(eventID, rooms);
     });
 
     let wr: WaitingRooms = { message: data.dateMessage, waitingRooms: waitingRooms };

@@ -1,4 +1,5 @@
 import { test, expect, mock, describe } from "bun:test";
+import axios from "axios";
 import {
     fetchEvents,
     concatEventTime,
@@ -100,27 +101,23 @@ describe("fetchEvents", () => {
             }
         };
 
-        // Mock the global fetch function
-        const mockFetch = mock(() => {
+        // Mock axios.get
+        const mockAxiosGet = mock(() => {
             return Promise.resolve({
-                ok: true,
-                json: async () => mockResponse
-            } as Response);
+                data: mockResponse,
+                status: 200,
+                statusText: 'OK'
+            });
         });
 
-        globalThis.fetch = mockFetch as any;
+        axios.get = mockAxiosGet as any;
 
         // Execute the function
         const result = await fetchEvents();
 
-        // Verify fetch was called with correct parameters
-        expect(mockFetch).toHaveBeenCalledTimes(1);
-        expect(mockFetch).toHaveBeenCalledWith(
-            "https://api.fortunemusic.app/v1/appGetEventData",
-            {
-                method: "GET"
-            }
-        );
+        // Verify axios.get was called with correct parameters
+        expect(mockAxiosGet).toHaveBeenCalledTimes(1);
+        expect(mockAxiosGet).toHaveBeenCalledWith("/api/events");
 
         // Verify the result structure
         expect(result).toBeInstanceOf(Map);
@@ -141,8 +138,8 @@ describe("fetchEvents", () => {
         expect(session101).toBeDefined();
         expect(session101?.id).toBe(101);
         expect(session101?.name).toBe("Morning Session");
-        expect(session101?.startTime).toBe(new Date("2025-11-05T10:00:00").toISOString());
-        expect(session101?.endTime).toBe(new Date("2025-11-05T12:00:00").toISOString());
+        expect(session101?.startTime).toEqual(new Date("2025-11-05T10:00:00"));
+        expect(session101?.endTime).toEqual(new Date("2025-11-05T12:00:00"));
         expect(session101?.members).toBeInstanceOf(Map);
         expect(session101?.members.size).toBe(1);
 
@@ -171,14 +168,15 @@ describe("fetchEvents", () => {
             }
         };
 
-        const mockFetch = mock(() => {
+        const mockAxiosGet = mock(() => {
             return Promise.resolve({
-                ok: true,
-                json: async () => mockResponse
-            } as Response);
+                data: mockResponse,
+                status: 200,
+                statusText: 'OK'
+            });
         });
 
-        globalThis.fetch = mockFetch as any;
+        axios.get = mockAxiosGet as any;
 
         const result = await fetchEvents();
 
@@ -230,14 +228,15 @@ describe("fetchEvents", () => {
             }
         };
 
-        const mockFetch = mock(() => {
+        const mockAxiosGet = mock(() => {
             return Promise.resolve({
-                ok: true,
-                json: async () => mockResponse
-            } as Response);
+                data: mockResponse,
+                status: 200,
+                statusText: 'OK'
+            });
         });
 
-        globalThis.fetch = mockFetch as any;
+        axios.get = mockAxiosGet as any;
 
         const result = await fetchEvents();
 
@@ -389,8 +388,8 @@ describe("flatternDateArrayAsSession", () => {
         expect(session101).toBeDefined();
         expect(session101?.id).toBe(101);
         expect(session101?.name).toBe("Morning Session");
-        expect(session101?.startTime).toBe(new Date("2025-11-05T10:00:00").toISOString());
-        expect(session101?.endTime).toBe(new Date("2025-11-05T12:00:00").toISOString());
+        expect(session101?.startTime).toEqual(new Date("2025-11-05T10:00:00"));
+        expect(session101?.endTime).toEqual(new Date("2025-11-05T12:00:00"));
         expect(session101?.members.size).toBe(1);
 
         const session102 = result.get(102);
