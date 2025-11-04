@@ -3,7 +3,6 @@ import { Users, Clock } from 'lucide-react';
 import type { Session } from '@/api/fortunemusic/events';
 import { EventTimer } from './ui/timer-event';
 import { Timer } from './ui/timer';
-import { formatDateTime } from '@/utils/date';
 
 interface StatsCardsProps {
   session: Session;
@@ -32,7 +31,7 @@ export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onMa
         <CardHeader className="pb-3">
           <CardTitle className="text-card-foreground flex items-center gap-2">
             <Users className="h-5 w-5 text-blue-500" />
-            Total Waiting People
+            Participants
           </CardTitle>
         </CardHeader>
         <CardContent>

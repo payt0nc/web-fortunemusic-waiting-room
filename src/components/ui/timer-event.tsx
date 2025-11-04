@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
+import { differenceInSeconds, isBefore } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { getTimerColors } from '@/lib/timer-colors';
 
@@ -24,20 +25,18 @@ export function EventTimer({ startAt, endAt, variant = 'event' }: EventTimerProp
 
   useEffect(() => {
     const calculateTimer = () => {
-      const current = new Date().getTime();
-      const startTime = startAt.getTime();
-      const endTime = endAt.getTime();
+      const current = new Date();
 
-      let targetTime: number;
+      let targetTime: Date;
       let label: string;
 
-      if (current < startTime) {
+      if (isBefore(current, startAt)) {
         // Before start time
-        targetTime = startTime;
+        targetTime = startAt;
         label = 'Time to Start';
-      } else if (current >= startTime && current < endTime) {
+      } else if (!isBefore(current, startAt) && isBefore(current, endAt)) {
         // Between start and end time
-        targetTime = endTime;
+        targetTime = endAt;
         label = 'Time to End';
       } else {
         // After end time
@@ -49,9 +48,10 @@ export function EventTimer({ startAt, endAt, variant = 'event' }: EventTimerProp
         return;
       }
 
-      const timeDifference = targetTime - current;
+      // Calculate total seconds difference
+      const totalSeconds = differenceInSeconds(targetTime, current);
 
-      if (timeDifference <= 0) {
+      if (totalSeconds <= 0) {
         setTimerState({
           label: 'Event Ended',
           timeText: '00:00:00',
@@ -61,7 +61,6 @@ export function EventTimer({ startAt, endAt, variant = 'event' }: EventTimerProp
       }
 
       // Calculate hours, minutes and seconds
-      const totalSeconds = Math.floor(timeDifference / 1000);
       const hours = Math.floor(totalSeconds / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
