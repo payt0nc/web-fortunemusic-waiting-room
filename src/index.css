@@ -3,7 +3,6 @@
 @layer base {
   :root {
     font-family: var(--font-sans);
-    --background-logo: url("assets/nogizaka46_logo.svg");
   }
 
   body {
