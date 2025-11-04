@@ -93,19 +93,15 @@ function convertEventsToNavigationLinks(events: Map<number, Event[]>): Navbar02N
   return barItems;
 }
 
-export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
-  (
-    {
-      className,
-      logo = null,
-      logoHref = '#',
-      events = new Map<number, Event[]>(),
-      onSignInClick,
-      onCtaClick,
-      ...props
-    },
-    ref
-  ) => {
+export const Navbar02 = ({
+  className,
+  logo = null,
+  logoHref = '#',
+  events = new Map<number, Event[]>(),
+  onSignInClick,
+  onCtaClick,
+  ...props
+}: Navbar02Props) => {
     const [isMobile, setIsMobile] = useState(false);
     const [navigationLinks, setNavigationLinks] = useState<Navbar02NavItem[]>([]);
     const containerRef = useRef<HTMLElement>(null);
@@ -135,32 +131,9 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
       setNavigationLinks(availableNavigationLinks);
     }, [events]);
 
-    // Combine refs
-    const combinedRef = React.useCallback((node: HTMLElement | null) => {
-      containerRef.current = node;
-      if (typeof ref === 'function') {
-        ref(node);
-      } else if (ref) {
-        ref.current = node;
-      }
-    }, [ref]);
-
-    const renderIcon = (iconName: string) => {
-      switch (iconName) {
-        case 'BookOpenIcon':
-          return <BookOpenIcon size={16} className="text-foreground opacity-60" aria-hidden={true} />;
-        case 'LifeBuoyIcon':
-          return <LifeBuoyIcon size={16} className="text-foreground opacity-60" aria-hidden={true} />;
-        case 'InfoIcon':
-          return <InfoIcon size={16} className="text-foreground opacity-60" aria-hidden={true} />;
-        default:
-          return null;
-      }
-    };
-
     return (
       <header
-        ref={combinedRef}
+        ref={containerRef}
         className={cn(
           'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline',
           className
@@ -300,10 +273,7 @@ export const Navbar02 = React.forwardRef<HTMLElement, Navbar02Props>(
         </div>
       </header>
     );
-  }
-);
-
-Navbar02.displayName = 'Navbar02';
+};
 
 // ListItem component for navigation menu items
 const ListItem = React.forwardRef<
