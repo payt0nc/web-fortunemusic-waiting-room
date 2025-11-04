@@ -1,6 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Event } from '@/api/fortunemusic/events';
-
+import { Card } from '@/components/ui/card';
+import { ShimmeringText } from "@/components/ui/shadcn-io/shimmering-text";
 
 interface EventCardProps {
     name: string;
@@ -9,13 +8,25 @@ interface EventCardProps {
 
 export function EventCard({ name, date }: EventCardProps) {
     return (
-        <Card className="mb-4">
-            <CardHeader>
-                <CardTitle>{name}</CardTitle>
-                <CardContent>
-                    <p>{date}</p>
-                </CardContent>
-            </CardHeader>
+        <Card>
+            <div className="flex flex-col items-start justify-center gap-2 p-6 text-left">
+                <div className="text-left">
+                    <ShimmeringText
+                        text={name}
+                        duration={2}
+                        wave={true}
+                        shimmeringColor="hsl(var(--primary))"
+                    />
+                </div>
+                <div className="text-left text-muted-foreground">
+                    <ShimmeringText
+                        text={date}
+                        duration={2}
+                        wave={false}
+                        shimmeringColor="hsl(var(--primary))"
+                    />
+                </div>
+            </div>
         </Card>
     );
 }

@@ -3,6 +3,7 @@ import { Users, Clock } from 'lucide-react';
 import type { Session } from '@/api/fortunemusic/events';
 import { EventTimer } from './ui/timer-event';
 import { Timer } from './ui/timer';
+import { formatDateTime } from '@/utils/date';
 
 interface StatsCardsProps {
   session: Session;
@@ -10,12 +11,13 @@ interface StatsCardsProps {
   nextRefreshTime: Date;
   loading: boolean;
   onManualRefresh: () => void;
+  totalWaitingPeople: number;
 }
 
-export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onManualRefresh }: StatsCardsProps) {
+export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onManualRefresh, totalWaitingPeople }: StatsCardsProps) {
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
       {/* Event Timer */}
       {!loading && session && (
         <EventTimer
@@ -25,20 +27,20 @@ export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onMa
         />
       )}
 
+      {/* Total Waiting People */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-card-foreground flex items-center gap-2">
-            <Clock className="h-5 w-5 text-green-500" />
-            Last Update
+            <Users className="h-5 w-5 text-blue-500" />
+            Total Waiting People
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-green-500">
-            {lastUpdate.toLocaleString('ja-JP', { hour12: false })}
+          <div className="text-3xl font-bold text-blue-500">
+            {totalWaitingPeople.toLocaleString()}
           </div>
         </CardContent>
       </Card>
-
       {/* Next Update Timer */}
       {!loading && (
         <Timer

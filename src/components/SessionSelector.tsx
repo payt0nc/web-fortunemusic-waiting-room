@@ -21,7 +21,7 @@ export function SessionSelector({
   }
 
   return (
-    <Card className="mb-8">
+    <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -30,7 +30,7 @@ export function SessionSelector({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
           {Array.from(sessions.entries()).map(([sessionID]) => (
             <label
               key={sessionID}

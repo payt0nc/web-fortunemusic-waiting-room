@@ -19,6 +19,10 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { type Event } from '@/api/fortunemusic/events';
+import { formatDate } from '@/utils/date';
+import { ThemeSwitcher } from '@/components/ui/shadcn-io/theme-switcher';
+import { GithubIcon } from '../../icons/lucide-github';
+import { IconButton } from '../icon-button';
 
 // Types
 export interface Navbar02NavItem {
@@ -72,7 +76,7 @@ function convertEventsToNavigationLinks(events: Map<number, Event[]>): Navbar02N
       listItems.push({
         href: `${event.id}`,
         label: `${event.name}`,
-        description: `${event.date.getFullYear()}-${String(event.date.getMonth() + 1).padStart(2, '0')}-${String(event.date.getDate()).padStart(2, '0')}`,
+        description: formatDate(event.date),
       });
     });
 
@@ -104,166 +108,215 @@ export const Navbar02 = ({
   onEventSelect,
   ...props
 }: Navbar02Props) => {
-    const [isMobile, setIsMobile] = useState(false);
-    const [navigationLinks, setNavigationLinks] = useState<Navbar02NavItem[]>([]);
-    const containerRef = useRef<HTMLElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [navigationLinks, setNavigationLinks] = useState<Navbar02NavItem[]>([]);
+  const containerRef = useRef<HTMLElement>(null);
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
+    // Load theme from localStorage on initial render
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+    return savedTheme || 'system';
+  });
 
-    useEffect(() => {
-      const checkWidth = () => {
-        if (containerRef.current) {
-          const width = containerRef.current.offsetWidth;
-          setIsMobile(width < 768); // 768px is md breakpoint
-        }
-      };
-
-      checkWidth();
-
-      const resizeObserver = new ResizeObserver(checkWidth);
+  useEffect(() => {
+    const checkWidth = () => {
       if (containerRef.current) {
-        resizeObserver.observe(containerRef.current);
+        const width = containerRef.current.offsetWidth;
+        setIsMobile(width < 768); // 768px is md breakpoint
       }
+    };
 
-      return () => {
-        resizeObserver.disconnect();
+    checkWidth();
+
+    const resizeObserver = new ResizeObserver(checkWidth);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    let availableNavigationLinks = convertEventsToNavigationLinks(events);
+    setNavigationLinks(availableNavigationLinks);
+  }, [events]);
+
+  // Apply theme to document
+  useEffect(() => {
+    const root = document.documentElement;
+
+    // Save theme to localStorage
+    localStorage.setItem('theme', theme);
+
+    const applyTheme = (themeToApply: 'light' | 'dark') => {
+      root.classList.remove('light', 'dark');
+      root.classList.add(themeToApply);
+    };
+
+    if (theme === 'system') {
+      // Check system preference
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const systemTheme = mediaQuery.matches ? 'dark' : 'light';
+      applyTheme(systemTheme);
+
+      // Listen for system theme changes
+      const handleChange = (e: MediaQueryListEvent) => {
+        applyTheme(e.matches ? 'dark' : 'light');
       };
-    }, []);
 
-    useEffect(() => {
-      let availableNavigationLinks = convertEventsToNavigationLinks(events);
-      setNavigationLinks(availableNavigationLinks);
-    }, [events]);
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    } else {
+      // Apply selected theme
+      applyTheme(theme);
+    }
+  }, [theme]);
 
-    return (
-      <header
-        ref={containerRef}
-        className={cn(
-          'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline',
-          className
-        )}
-        {...props}
-      >
-        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
-          {/* Left side */}
-          <div className="flex items-center gap-2">
-            {/* Mobile menu trigger */}
-            {isMobile && (
-              <Popover>
-                <PopoverContent align="start" className="w-64 p-1">
-                  <NavigationMenu className="max-w-none">
-                    <NavigationMenuList className="flex-col items-start gap-0">
-                      {navigationLinks.map((link, index) => (
-                        <NavigationMenuItem key={index} className="w-full">
-                          {link.submenu ? (
-                            <>
-                              <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
-                                {link.label}
-                              </div>
-                              <ul>
-                                {link.items?.map((item, itemIndex) => (
-                                  <li key={itemIndex}>
-                                    <button
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        if (onEventSelect && item.href) {
-                                          onEventSelect(item.href);
-                                        }
-                                      }}
-                                      className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
-                                    >
-                                      {item.label}
-                                    </button>
-                                  </li>
-                                ))}
-                              </ul>
-                            </>
-                          ) : (
-                            <button
-                              onClick={(e) => e.preventDefault()}
-                              className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
-                            >
-                              {link.label}
-                            </button>
-                          )}
-                        </NavigationMenuItem>
-                      ))}
-                    </NavigationMenuList>
-                  </NavigationMenu>
-                </PopoverContent>
-              </Popover>
-            )}
-            {/* Main nav */}
-            <div className="flex items-center gap-6">
-              <button
-                onClick={(e) => e.preventDefault()}
-                className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
-              >
-                <div className="text-2xl">
-                  {logo}
-                </div>
-                <span className="hidden font-bold text-xl sm:inline-block">fm.n46.io</span>
-              </button>
-              {/* Navigation menu */}
-              {!isMobile && (
-                <NavigationMenu className="flex">
-                  <NavigationMenuList className="gap-1">
+  return (
+    <header
+      ref={containerRef}
+      className={cn(
+        'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline',
+        className
+      )}
+      {...props}
+    >
+      <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
+        {/* Left side */}
+        <div className="flex items-center gap-2">
+          {/* Mobile menu trigger */}
+          {isMobile && (
+            <Popover>
+              <PopoverContent align="start" className="w-64 p-1">
+                <NavigationMenu className="max-w-none">
+                  <NavigationMenuList className="flex-col items-start gap-0">
                     {navigationLinks.map((link, index) => (
-                      <NavigationMenuItem key={index}>
+                      <NavigationMenuItem key={index} className="w-full">
                         {link.submenu ? (
                           <>
-                            <NavigationMenuTrigger>
+                            <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
                               {link.label}
-                            </NavigationMenuTrigger>
-                            <NavigationMenuContent>
-                              {link.type === 'simple' ? (
-                                <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[600px] text-left">
-                                  {link.items?.map((item, itemIndex) => (
-                                    <ListItem
-                                      key={itemIndex}
-                                      title={item.label}
-                                      href={item.href}
-                                      type={link.type}
-                                      onEventSelect={onEventSelect}
-                                    >
-                                      {item.description}
-                                    </ListItem>
-                                  ))}
-                                </div>
-                              ) : (
-                                <div className="grid gap-3 p-4">
-                                  {link.items?.map((item, itemIndex) => (
-                                    <ListItem
-                                      key={itemIndex}
-                                      title={item.label}
-                                      href={item.href}
-                                      type={link.type}
-                                      onEventSelect={onEventSelect}
-                                    >
-                                      {item.description}
-                                    </ListItem>
-                                  ))}
-                                </div>
-                              )}
-                            </NavigationMenuContent>
+                            </div>
+                            <ul>
+                              {link.items?.map((item, itemIndex) => (
+                                <li key={itemIndex}>
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (onEventSelect && item.href) {
+                                        onEventSelect(item.href);
+                                      }
+                                    }}
+                                    className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
+                                  >
+                                    {item.label}
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
                           </>
                         ) : (
-                          <NavigationMenuLink
-                            href={link.href}
-                            className={cn(navigationMenuTriggerStyle(), 'cursor-pointer')}
+                          <button
                             onClick={(e) => e.preventDefault()}
+                            className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
                           >
                             {link.label}
-                          </NavigationMenuLink>
+                          </button>
                         )}
                       </NavigationMenuItem>
                     ))}
                   </NavigationMenuList>
                 </NavigationMenu>
-              )}
-            </div>
+              </PopoverContent>
+            </Popover>
+          )}
+          {/* Main nav */}
+          <div className="flex items-center gap-6">
+            <button
+              onClick={(e) => e.preventDefault()}
+              className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
+            >
+              <div className="text-2xl">
+                {logo}
+              </div>
+              <span className="hidden font-bold text-xl sm:inline-block">Online Meet Dashboard</span>
+            </button>
+            {/* Navigation menu */}
+            {!isMobile && (
+              <NavigationMenu className="flex">
+                <NavigationMenuList className="gap-1">
+                  {navigationLinks.map((link, index) => (
+                    <NavigationMenuItem key={index}>
+                      {link.submenu ? (
+                        <>
+                          <NavigationMenuTrigger>
+                            {link.label}
+                          </NavigationMenuTrigger>
+                          <NavigationMenuContent>
+                            {link.type === 'simple' ? (
+                              <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[600px] text-left">
+                                {link.items?.map((item, itemIndex) => (
+                                  <ListItem
+                                    key={itemIndex}
+                                    title={item.label}
+                                    href={item.href}
+                                    type={link.type}
+                                    onEventSelect={onEventSelect}
+                                  >
+                                    {item.description}
+                                  </ListItem>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="grid gap-3 p-4">
+                                {link.items?.map((item, itemIndex) => (
+                                  <ListItem
+                                    key={itemIndex}
+                                    title={item.label}
+                                    href={item.href}
+                                    type={link.type}
+                                    onEventSelect={onEventSelect}
+                                  >
+                                    {item.description}
+                                  </ListItem>
+                                ))}
+                              </div>
+                            )}
+                          </NavigationMenuContent>
+                        </>
+                      ) : (
+                        <NavigationMenuLink
+                          href={link.href}
+                          className={cn(navigationMenuTriggerStyle(), 'cursor-pointer')}
+                          onClick={(e) => e.preventDefault()}
+                        >
+                          {link.label}
+                        </NavigationMenuLink>
+                      )}
+                    </NavigationMenuItem>
+                  ))}
+                </NavigationMenuList>
+              </NavigationMenu>
+            )}
           </div>
-          {/* Right side */}
-          <div className="flex items-center gap-3">
-            {
+        </div>
+        {/* Right side */}
+        <div className="flex items-center gap-3">
+
+
+          {/*
+            Note: Temporarily removing CTA button for future features
+            <ThemeSwitcher defaultValue="system" onChange={setTheme} value={theme} />
+          */}
+          <IconButton
+            icon={GithubIcon}
+            color={[0, 0, 0]}
+            onClick={() => window.open('https://github.com/payt0nc/web-fortunemusic-waiting-room', '_blank')}
+            size="md"
+          />
+
+          {
             /* 
             TODO: Dark Mode
             TODO: Github
@@ -278,10 +331,10 @@ export const Navbar02 = ({
               {ctaText}
             </Button>
             */}
-          </div>
         </div>
-      </header>
-    );
+      </div>
+    </header>
+  );
 };
 
 // ListItem component for navigation menu items

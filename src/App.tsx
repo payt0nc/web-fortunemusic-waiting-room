@@ -6,7 +6,7 @@ import { findNearestEvent } from "@/lib/aggregator";
 import { EventCard } from "@/components/EventCard";
 import { StatsCards } from "@/components/StatsCards";
 import { WaitingRoomGrid } from "@/components/WaitingRoomGrid";
-import EventSelectSheet from "@/components/EventSelectSheet";
+import { formatDate } from "@/utils/date";
 
 import {
   Banner,
@@ -32,6 +32,17 @@ function extractMembers(sessions: Map<number, Session>): Map<string, Member> {
     });
   });
   return members;
+}
+
+// Calculate total waiting people from waiting rooms
+function calculateTotalWaitingPeople(waitingRooms: Map<number, WaitingRoom[]>): number {
+  let total = 0;
+  waitingRooms.forEach((rooms) => {
+    rooms.forEach((room) => {
+      total += room.peopleCount;
+    });
+  });
+  return total;
 }
 
 // Map artist name to logo URL
@@ -63,6 +74,7 @@ export function App() {
   let [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
   let [waitingRooms, setWaitingRooms] = useState<Map<number, WaitingRoom[]>>(new Map());
+  let [totalWaitingPeople, setTotalWaitingPeople] = useState<number>(0);
 
   let [members, setMembers] = useState<Map<string, Member>>(new Map());
 
@@ -104,6 +116,7 @@ export function App() {
         };
 
         setWaitingRooms(wr.waitingRooms);
+        setTotalWaitingPeople(calculateTotalWaitingPeople(wr.waitingRooms));
         console.log("Fetched Waiting Rooms:", wr);
 
         // Update refresh times
@@ -136,6 +149,7 @@ export function App() {
       };
 
       setWaitingRooms(wr.waitingRooms);
+      setTotalWaitingPeople(calculateTotalWaitingPeople(wr.waitingRooms));
       console.log("Refreshed Waiting Rooms:", wr);
 
       // Update refresh times
@@ -210,61 +224,83 @@ export function App() {
   }, [nextRefreshTime, loading, selectedSession]);
 
   return (
-    <div className="container w-full mx-auto p-8 text-center relative z-10">
-      {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p className="font-semibold">Error loading events:</p>
-          <p className="text-sm">{error}</p>
-        </div>
-      )}
-
-      {loading && (
-        <div className="mb-4 p-4">
-          <p className="text-muted-foreground">Loading events...</p>
-        </div>
-      )}
-
-      {
-        notice && (
-          <Banner>
-            <BannerIcon icon={CircleAlert} />
-            <BannerTitle>{notice}</BannerTitle>
-            <BannerClose />
-          </Banner>
-        )
-      }
+    <div className="min-h-screen relative">
+      {/* Navigation Bar - Full width, no padding */}
       <Navbar02 events={events} onEventSelect={handleEventSelect} />
-      <EventCard
-        name={selectedEvent?.name!}
-        date={selectedEvent?.date?.toDateString() || ''}
-      />
 
-      <SessionSelector
-        id={selectedSession?.id || null}
-        sessions={sessions}
-        onEventSelect={(eventId: number) => {
-          setSelectedSession(sessions.get(eventId) || null);
-          console.log("Selected Event ID:", eventId);
-        }}
-      />
+      {/* Main Content Container - With appropriate padding */}
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
+        {/* Error Message */}
+        {error && (
+          <div className="mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <p className="font-semibold">Error loading events:</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
 
-      <StatsCards
-        session={selectedSession!}
-        lastUpdate={lastUpdate}
-        nextRefreshTime={nextRefreshTime}
-        loading={loading}
-        onManualRefresh={() => {
-          console.log("Manual refresh triggered");
-          refreshWaitingRooms();
-        }}
-      />
+        {/* Loading Message */}
+        {loading && (
+          <div className="mt-6 p-4">
+            <p className="text-muted-foreground">Loading events...</p>
+          </div>
+        )}
 
-      <WaitingRoomGrid
-        currentSessionID={selectedSession?.id || 0}
-        waitingRooms={waitingRooms}
-        members={members}
-      />
-    </div >
+        {/* Notice Banner */}
+        {notice && (
+          <div className="mt-6">
+            <Banner>
+              <BannerIcon icon={CircleAlert} />
+              <BannerTitle>{notice}</BannerTitle>
+              <BannerClose />
+            </Banner>
+          </div>
+        )}
+
+        {/* Event Info Card */}
+        <div className="mt-6">
+          <EventCard
+            name={selectedEvent?.name!}
+            date={selectedEvent?.date ? formatDate(selectedEvent.date) : ''}
+          />
+        </div>
+
+        {/* Session Selector */}
+        <div className="mt-6">
+          <SessionSelector
+            id={selectedSession?.id || null}
+            sessions={sessions}
+            onEventSelect={(eventId: number) => {
+              setSelectedSession(sessions.get(eventId) || null);
+              console.log("Selected Event ID:", eventId);
+            }}
+          />
+        </div>
+
+        {/* Stats Cards */}
+        <div className="mt-6">
+          <StatsCards
+            session={selectedSession!}
+            lastUpdate={lastUpdate}
+            nextRefreshTime={nextRefreshTime}
+            loading={loading}
+            onManualRefresh={() => {
+              console.log("Manual refresh triggered");
+              refreshWaitingRooms();
+            }}
+            totalWaitingPeople={totalWaitingPeople}
+          />
+        </div>
+
+        {/* Waiting Room Grid */}
+        <div className="mt-6 mb-8">
+          <WaitingRoomGrid
+            currentSessionID={selectedSession?.id || 0}
+            waitingRooms={waitingRooms}
+            members={members}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 
