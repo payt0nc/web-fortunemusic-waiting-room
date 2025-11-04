@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardHeader, CardTitle } from './ui/card';
 import { Users, Clock } from 'lucide-react';
 import type { Session } from '@/api/fortunemusic/events';
 import { EventTimer } from './ui/timer-event';
-import { Timer } from './ui/timer';
+import { TimerProgress } from './ui/timer-progress';
 
 interface StatsCardsProps {
   session: Session;
@@ -28,26 +28,27 @@ export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onMa
 
       {/* Total Waiting People */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-card-foreground flex items-center gap-2">
-            <Users className="h-5 w-5 text-blue-500" />
-            Participants
+        <CardHeader>
+          <CardTitle className="text-card-foreground flex flex-auto items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
+              <Users className="h-5 w-5 text-blue-500" />
+              Participants
+            </div>
+            <span className="text-2xl font-bold text-blue-500">
+              {totalWaitingPeople.toLocaleString()}
+            </span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-blue-500">
-            {totalWaitingPeople.toLocaleString()}
-          </div>
-        </CardContent>
       </Card>
       {/* Next Update Timer */}
-      {!loading && (
-        <Timer
+      {!loading && session && (
+        <TimerProgress
           targetTime={nextRefreshTime}
-          label="Next Update"
-          icon="refresh"
+          startTime={lastUpdate}
           variant="refresh"
           onRefreshClick={onManualRefresh}
+          eventStartTime={session.startTime}
+          eventEndTime={session.endTime}
         />
       )}
     </div>
