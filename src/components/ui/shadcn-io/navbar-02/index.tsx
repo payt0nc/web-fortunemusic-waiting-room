@@ -42,9 +42,9 @@ export interface Navbar02NavItem {
 // Artist color mapping
 const getArtistColorClasses = (artistName: string): string => {
   const colorMap: Record<string, string> = {
-    '乃木坂46': 'text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
-    '櫻坂46': 'text-pink-600 hover:bg-pink-50 dark:text-pink-300 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
-    '日向坂46': 'text-sky-400 hover:bg-sky-50 dark:text-sky-300 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
+    '乃木坂46': 'text-purple-600 hover:bg-purple-50 dark:text-purple-600 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
+    '櫻坂46': 'text-pink-300 hover:bg-pink-50 dark:text-pink-300 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
+    '日向坂46': 'text-sky-400 hover:bg-sky-50 dark:text-sky-400 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
   };
 
   return colorMap[artistName] || 'text-black hover:bg-gray-50 dark:text-white dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card';
