@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Clock, RefreshCw } from 'lucide-react';
+import { differenceInSeconds, isAfter } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { getTimerColors } from '@/lib/timer-colors';
 
@@ -30,11 +31,11 @@ export function Timer({ targetTime, label, icon = 'clock', variant = 'refresh', 
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
-      const now = new Date().getTime();
-      const target = new Date(targetTime).getTime();
-      const difference = target - now;
+      const now = new Date();
+      const target = new Date(targetTime);
 
-      if (difference <= 0) {
+      // Check if target time has passed
+      if (!isAfter(target, now)) {
         setTimeRemaining({
           days: 0,
           hours: 0,
@@ -45,10 +46,13 @@ export function Timer({ targetTime, label, icon = 'clock', variant = 'refresh', 
         return;
       }
 
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      // Calculate total seconds difference
+      const totalSeconds = differenceInSeconds(target, now);
+
+      const days = Math.floor(totalSeconds / (60 * 60 * 24));
+      const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+      const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+      const seconds = totalSeconds % 60;
 
       setTimeRemaining({
         days,

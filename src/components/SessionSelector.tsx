@@ -25,7 +25,7 @@ export function SessionSelector({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CardTitle>Select Session</CardTitle>
+            <CardTitle>Sessions</CardTitle>
           </div>
         </div>
       </CardHeader>

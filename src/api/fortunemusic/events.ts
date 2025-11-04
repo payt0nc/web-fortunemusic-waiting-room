@@ -1,4 +1,5 @@
 import axios from "axios";
+import { parseISO, setHours, setMinutes, setSeconds, isValid, isAfter } from 'date-fns';
 
 export interface Event {
     id: number;
@@ -120,8 +121,8 @@ export async function fetchEvents(): Promise<Map<number, Event[]>> {
 
 
 export function concatEventTime(dt: string, t: string): Date {
-    let datetime = new Date(dt);
-    if (isNaN(datetime.getTime())) {
+    let datetime = parseISO(dt);
+    if (!isValid(datetime)) {
         throw new Error(`Invalid date string: ${dt}`);
     }
 
@@ -142,7 +143,11 @@ export function concatEventTime(dt: string, t: string): Date {
         throw new Error("Invalid time values in the string.");
     }
 
-    datetime.setHours(hours, minutes, seconds);
+    // Set hours, minutes, and seconds using date-fns
+    datetime = setHours(datetime, hours);
+    datetime = setMinutes(datetime, minutes);
+    datetime = setSeconds(datetime, seconds);
+
     return datetime;
 }
 
@@ -186,15 +191,17 @@ export function flatternEventArray(artistName: string, eventArray: EventArray[])
         let eventName = event.evtName;
         let eventPhotoUrl = event.evtPhotUrl;
         event.dateArray.forEach((date) => {
-            let eventDt = new Date(date.dateDate);
-            if (eventDt >= new Date()) {
+            let eventDt = parseISO(date.dateDate);
+            const now = new Date();
+            // Check if event date is today or in the future
+            if (isAfter(eventDt, now) || eventDt.toDateString() === now.toDateString()) {
                 let sessions = flatternTimezoneArray(date.dateDate, date.timeZoneArray);
                 let currentEvent: Event = {
                     id: event.evtId,
                     name: eventName,
                     artistName: artistName,
                     photoUrl: eventPhotoUrl,
-                    date: new Date(date.dateDate),
+                    date: parseISO(date.dateDate),
                     sessions: sessions,
                 };
                 events.push(currentEvent);
