@@ -10,8 +10,6 @@
     min-height: 100vh;
     position: relative;
     margin: 0;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
   }
 }
 

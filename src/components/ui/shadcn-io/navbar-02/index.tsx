@@ -188,7 +188,9 @@ export const Navbar02 = ({
     <header
       ref={containerRef}
       className={cn(
-        'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline',
+        'sticky top-0 z-50 w-full border-b backdrop-blur px-4 md:px-6 [&_*]:no-underline',
+        'bg-background/95 supports-[backdrop-filter]:bg-background/60',
+        'dark:!bg-black/85 dark:supports-[backdrop-filter]:!bg-black/85',
         className
       )}
       {...props}
