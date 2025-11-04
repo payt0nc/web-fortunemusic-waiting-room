@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
-import { BookOpenIcon, InfoIcon, LifeBuoyIcon } from 'lucide-react';
+import { BookOpenIcon, InfoIcon, LifeBuoyIcon, MenuIcon } from 'lucide-react';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -188,6 +188,14 @@ export const Navbar02 = ({
           {/* Mobile menu trigger */}
           {isMobile && (
             <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+                  aria-label="Open menu"
+                >
+                  <MenuIcon className="h-5 w-5" />
+                </button>
+              </PopoverTrigger>
               <PopoverContent align="start" className="w-64 p-1">
                 <NavigationMenu className="max-w-none">
                   <NavigationMenuList className="flex-col items-start gap-0">

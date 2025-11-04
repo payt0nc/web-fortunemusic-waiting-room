@@ -46,19 +46,23 @@ function calculateTotalWaitingPeople(waitingRooms: Map<number, WaitingRoom[]>): 
 }
 
 // Map artist name to logo URL
-function getArtistLogo(artistName: string): string {
+function getArtistLogo(artistName: string): string | null {
   const logoMap: Record<string, string> = {
     '乃木坂46': nogizaka46Logo,
     '櫻坂46': sakurazaka46Logo,
     '日向坂46': hinatazaka46Logo,
   };
-  return logoMap[artistName] || nogizaka46Logo;
+  return logoMap[artistName] || null;
 }
 
 // Update background image
-function updateBackgroundImage(logoUrl: string) {
-  // Update CSS custom property with the imported logo URL
-  document.documentElement.style.setProperty('--background-logo', `url("${logoUrl}")`);
+function updateBackgroundImage(logoUrl: string | null) {
+  // Update CSS custom property with the imported logo URL or clear it for blank background
+  if (logoUrl) {
+    document.documentElement.style.setProperty('--background-logo', `url("${logoUrl}")`);
+  } else {
+    document.documentElement.style.setProperty('--background-logo', 'none');
+  }
 }
 
 
