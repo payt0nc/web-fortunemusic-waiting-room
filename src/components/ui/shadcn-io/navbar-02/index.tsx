@@ -39,6 +39,17 @@ export interface Navbar02NavItem {
   }>;
 }
 
+// Artist color mapping
+const getArtistColorClasses = (artistName: string): string => {
+  const colorMap: Record<string, string> = {
+    '乃木坂46': 'text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
+    '櫻坂46': 'text-pink-600 hover:bg-pink-50 dark:text-pink-300 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
+    '日向坂46': 'text-sky-400 hover:bg-sky-50 dark:text-sky-300 dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card',
+  };
+
+  return colorMap[artistName] || 'text-black hover:bg-gray-50 dark:text-white dark:border-white/20 dark:hover:border-white/40 dark:hover:bg-white/5 dark:bg-card';
+};
+
 export interface Navbar02Props extends React.HTMLAttributes<HTMLElement> {
   logo?: React.ReactNode;
   logoHref?: string;
@@ -196,44 +207,50 @@ export const Navbar02 = ({
                   <MenuIcon className="h-5 w-5" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-64 p-1">
+              <PopoverContent align="start" className="w-64 p-1 max-h-[80vh] overflow-y-auto">
                 <NavigationMenu className="max-w-none">
-                  <NavigationMenuList className="flex-col items-start gap-0">
-                    {navigationLinks.map((link, index) => (
-                      <NavigationMenuItem key={index} className="w-full">
-                        {link.submenu ? (
-                          <>
-                            <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
+                  <NavigationMenuList className="flex-col items-start gap-0 select-none">
+                    {navigationLinks.map((link, index) => {
+                      const colorClasses = getArtistColorClasses(link.label);
+                      return (
+                        <NavigationMenuItem key={index} className="w-full">
+                          {link.submenu ? (
+                            <>
+                              <div className={cn(
+                                "px-2 py-1.5 text-xs font-medium border rounded-md mb-1",
+                                colorClasses
+                              )}>
+                                {link.label}
+                              </div>
+                              <ul>
+                                {link.items?.map((item, itemIndex) => (
+                                  <li key={itemIndex}>
+                                    <button
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        if (onEventSelect && item.href) {
+                                          onEventSelect(item.href);
+                                        }
+                                      }}
+                                      className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
+                                    >
+                                      {item.label}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </>
+                          ) : (
+                            <button
+                              onClick={(e) => e.preventDefault()}
+                              className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
+                            >
                               {link.label}
-                            </div>
-                            <ul>
-                              {link.items?.map((item, itemIndex) => (
-                                <li key={itemIndex}>
-                                  <button
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      if (onEventSelect && item.href) {
-                                        onEventSelect(item.href);
-                                      }
-                                    }}
-                                    className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
-                                  >
-                                    {item.label}
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        ) : (
-                          <button
-                            onClick={(e) => e.preventDefault()}
-                            className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
-                          >
-                            {link.label}
-                          </button>
-                        )}
-                      </NavigationMenuItem>
-                    ))}
+                            </button>
+                          )}
+                        </NavigationMenuItem>
+                      );
+                    })}
                   </NavigationMenuList>
                 </NavigationMenu>
               </PopoverContent>
@@ -254,56 +271,62 @@ export const Navbar02 = ({
             {!isMobile && (
               <NavigationMenu className="flex">
                 <NavigationMenuList className="gap-1">
-                  {navigationLinks.map((link, index) => (
-                    <NavigationMenuItem key={index}>
-                      {link.submenu ? (
-                        <>
-                          <NavigationMenuTrigger>
+                  {navigationLinks.map((link, index) => {
+                    const colorClasses = getArtistColorClasses(link.label);
+                    return (
+                      <NavigationMenuItem key={index}>
+                        {link.submenu ? (
+                          <>
+                            <NavigationMenuTrigger className={cn(
+                              'border transition-all',
+                              colorClasses
+                            )}>
+                              {link.label}
+                            </NavigationMenuTrigger>
+                            <NavigationMenuContent>
+                              {link.type === 'simple' ? (
+                                <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[600px] text-left">
+                                  {link.items?.map((item, itemIndex) => (
+                                    <ListItem
+                                      key={itemIndex}
+                                      title={item.label}
+                                      href={item.href}
+                                      type={link.type}
+                                      onEventSelect={onEventSelect}
+                                    >
+                                      {item.description}
+                                    </ListItem>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="grid gap-3 p-4">
+                                  {link.items?.map((item, itemIndex) => (
+                                    <ListItem
+                                      key={itemIndex}
+                                      title={item.label}
+                                      href={item.href}
+                                      type={link.type}
+                                      onEventSelect={onEventSelect}
+                                    >
+                                      {item.description}
+                                    </ListItem>
+                                  ))}
+                                </div>
+                              )}
+                            </NavigationMenuContent>
+                          </>
+                        ) : (
+                          <NavigationMenuLink
+                            href={link.href}
+                            className={cn(navigationMenuTriggerStyle(), 'cursor-pointer')}
+                            onClick={(e) => e.preventDefault()}
+                          >
                             {link.label}
-                          </NavigationMenuTrigger>
-                          <NavigationMenuContent>
-                            {link.type === 'simple' ? (
-                              <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[600px] text-left">
-                                {link.items?.map((item, itemIndex) => (
-                                  <ListItem
-                                    key={itemIndex}
-                                    title={item.label}
-                                    href={item.href}
-                                    type={link.type}
-                                    onEventSelect={onEventSelect}
-                                  >
-                                    {item.description}
-                                  </ListItem>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="grid gap-3 p-4">
-                                {link.items?.map((item, itemIndex) => (
-                                  <ListItem
-                                    key={itemIndex}
-                                    title={item.label}
-                                    href={item.href}
-                                    type={link.type}
-                                    onEventSelect={onEventSelect}
-                                  >
-                                    {item.description}
-                                  </ListItem>
-                                ))}
-                              </div>
-                            )}
-                          </NavigationMenuContent>
-                        </>
-                      ) : (
-                        <NavigationMenuLink
-                          href={link.href}
-                          className={cn(navigationMenuTriggerStyle(), 'cursor-pointer')}
-                          onClick={(e) => e.preventDefault()}
-                        >
-                          {link.label}
-                        </NavigationMenuLink>
-                      )}
-                    </NavigationMenuItem>
-                  ))}
+                          </NavigationMenuLink>
+                        )}
+                      </NavigationMenuItem>
+                    );
+                  })}
                 </NavigationMenuList>
               </NavigationMenu>
             )}
