@@ -20,6 +20,7 @@ import "./index.css";
 import nogizaka46Logo from "./assets/nogizaka46_logo.svg";
 import sakurazaka46Logo from "./assets/sakurazaka46_logo.svg";
 import hinatazaka46Logo from "./assets/hinatazaka46_logo.svg";
+import { Navbar02 } from "./components/ui/shadcn-io/navbar-02";
 
 
 
@@ -198,23 +199,7 @@ export function App() {
           </Banner>
         )
       }
-
-      <EventSelectSheet
-        events={events}
-        onEventSelect={(event) => {
-          setSelectedEvent(event);
-          setSessions(event.sessions);
-          setMembers(extractMembers(event.sessions));
-
-
-          const firstSessionId = event.sessions.keys().next().value;
-          if (firstSessionId) {
-            const firstSession = event.sessions.get(firstSessionId);
-            setSelectedSession(firstSession || null);
-          }
-        }}
-      />
-
+      <Navbar02 events={events} />
       <EventCard
         name={selectedEvent?.name!}
         date={selectedEvent?.date?.toDateString() || ''}

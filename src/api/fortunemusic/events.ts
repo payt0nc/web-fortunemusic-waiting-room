@@ -82,12 +82,12 @@ interface TicketArray {
     tkName: string
 }
 
-const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46"];
+const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46", "=LOVE"];
 
 export async function fetchEvents(): Promise<Map<number, Event[]>> {
     // Use local proxy in development, CORS proxy for GitHub Pages deployment
     const isProduction = process.env.NODE_ENV === 'production';
-    const link = isProduction 
+    const link = isProduction
         ? "https://corsproxy.io/?https://api.fortunemusic.app/v1/appGetEventData/"
         : "/api/events"
 
@@ -186,16 +186,19 @@ export function flatternEventArray(artistName: string, eventArray: EventArray[])
         let eventName = event.evtName;
         let eventPhotoUrl = event.evtPhotUrl;
         event.dateArray.forEach((date) => {
-            let sessions = flatternTimezoneArray(date.dateDate, date.timeZoneArray);
-            let currentEvent: Event = {
-                id: event.evtId,
-                name: eventName,
-                artistName: artistName,
-                photoUrl: eventPhotoUrl,
-                date: new Date(date.dateDate),
-                sessions: sessions,
-            };
-            events.push(currentEvent);
+            let eventDt = new Date(date.dateDate);
+            if (eventDt >= new Date()) {
+                let sessions = flatternTimezoneArray(date.dateDate, date.timeZoneArray);
+                let currentEvent: Event = {
+                    id: event.evtId,
+                    name: eventName,
+                    artistName: artistName,
+                    photoUrl: eventPhotoUrl,
+                    date: new Date(date.dateDate),
+                    sessions: sessions,
+                };
+                events.push(currentEvent);
+            }
         });
         eventMap.set(event.evtId, events);
     });
