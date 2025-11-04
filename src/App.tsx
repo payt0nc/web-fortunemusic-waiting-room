@@ -146,6 +146,40 @@ export function App() {
     }
   };
 
+  // Handle event selection from navbar
+  const handleEventSelect = (eventId: string) => {
+    // Find the event with the matching ID
+    let foundEvent: Event | null = null;
+    events.forEach((eventList: Event[]) => {
+      const event = eventList.find((e: Event) => e.id.toString() === eventId);
+      if (event) {
+        foundEvent = event;
+      }
+    });
+
+    if (foundEvent) {
+      const selectedEventData: Event = foundEvent;
+      setSelectedEvent(selectedEventData);
+      setSessions(selectedEventData.sessions);
+
+      // Extract and update members from the new event's sessions
+      const updatedMembers = extractMembers(selectedEventData.sessions);
+      setMembers(updatedMembers);
+
+      // Auto-select the first session of the selected event
+      const firstSessionKey = selectedEventData.sessions.keys().next().value;
+      if (firstSessionKey !== undefined) {
+        const firstSession = selectedEventData.sessions.get(firstSessionKey);
+        if (firstSession) {
+          setSelectedSession(firstSession);
+        }
+      }
+
+      console.log("Selected Event from Navbar:", selectedEventData);
+      console.log("Updated Members:", updatedMembers);
+    }
+  };
+
   // Update background when event changes
   useEffect(() => {
     if (selectedEvent) {
@@ -199,7 +233,7 @@ export function App() {
           </Banner>
         )
       }
-      <Navbar02 events={events} />
+      <Navbar02 events={events} onEventSelect={handleEventSelect} />
       <EventCard
         name={selectedEvent?.name!}
         date={selectedEvent?.date?.toDateString() || ''}

@@ -45,6 +45,7 @@ export interface Navbar02Props extends React.HTMLAttributes<HTMLElement> {
   ctaHref?: string;
   onSignInClick?: () => void;
   onCtaClick?: () => void;
+  onEventSelect?: (eventId: string) => void;
 }
 
 
@@ -100,6 +101,7 @@ export const Navbar02 = ({
   events = new Map<number, Event[]>(),
   onSignInClick,
   onCtaClick,
+  onEventSelect,
   ...props
 }: Navbar02Props) => {
     const [isMobile, setIsMobile] = useState(false);
@@ -160,7 +162,12 @@ export const Navbar02 = ({
                                 {link.items?.map((item, itemIndex) => (
                                   <li key={itemIndex}>
                                     <button
-                                      onClick={(e) => e.preventDefault()}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        if (onEventSelect && item.href) {
+                                          onEventSelect(item.href);
+                                        }
+                                      }}
                                       className="flex w-full items-left rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
                                     >
                                       {item.label}
@@ -215,6 +222,7 @@ export const Navbar02 = ({
                                       title={item.label}
                                       href={item.href}
                                       type={link.type}
+                                      onEventSelect={onEventSelect}
                                     >
                                       {item.description}
                                     </ListItem>
@@ -228,6 +236,7 @@ export const Navbar02 = ({
                                       title={item.label}
                                       href={item.href}
                                       type={link.type}
+                                      onEventSelect={onEventSelect}
                                     >
                                       {item.description}
                                     </ListItem>
@@ -284,8 +293,9 @@ const ListItem = React.forwardRef<
     icon?: string;
     type?: 'description' | 'simple' | 'icon';
     children?: React.ReactNode;
+    onEventSelect?: (eventId: string) => void;
   }
->(({ className, title, children, icon, type, ...props }, ref) => {
+>(({ className, title, children, icon, type, href, onEventSelect, ...props }, ref) => {
   const renderIconComponent = (iconName?: string) => {
     if (!iconName) return null;
     switch (iconName) {
@@ -300,11 +310,18 @@ const ListItem = React.forwardRef<
     }
   };
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (onEventSelect && href) {
+      onEventSelect(href);
+    }
+  };
+
   return (
     <NavigationMenuLink asChild>
       <a
         ref={ref}
-        onClick={(e) => e.preventDefault()}
+        onClick={handleClick}
         className={cn(
           'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer',
           className
