@@ -303,34 +303,13 @@ export const Navbar02 = ({
         </div>
         {/* Right side */}
         <div className="flex items-center gap-3">
-
-
-          {/*
-            Note: Temporarily removing CTA button for future features
-            <ThemeSwitcher defaultValue="system" onChange={setTheme} value={theme} />
-          */}
+          <ThemeSwitcher defaultValue="system" onChange={setTheme} value={theme} />
           <IconButton
             icon={GithubIcon}
             color={[0, 0, 0]}
             onClick={() => window.open('https://github.com/payt0nc/web-fortunemusic-waiting-room', '_blank')}
             size="md"
           />
-
-          {
-            /* 
-            TODO: Dark Mode
-            TODO: Github
-            <Button
-              size="sm"
-              className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onCtaClick) onCtaClick();
-              }}
-            >
-              {ctaText}
-            </Button>
-            */}
         </div>
       </div>
     </header>
