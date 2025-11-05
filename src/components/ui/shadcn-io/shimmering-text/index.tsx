@@ -20,8 +20,8 @@ function ShimmeringText({
   transition,
   wave = false,
   className,
-  color = 'light:var(--color-neutral-700)  dark:var(--color-neutral-100)',
-  shimmeringColor = 'light:var(--color-neutral-700)  dark:var(--color-neutral-100)',
+  color = 'var(--color-neutral-700)',
+  shimmeringColor = 'var(--color-neutral-700)',
   ...props
 }: ShimmeringTextProps) {
   return (
