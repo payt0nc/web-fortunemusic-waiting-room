@@ -3,7 +3,7 @@ import { parseISO } from 'date-fns';
 /**
  * Utility functions for handling Japanese timezone conversion
  * All data from the API is in Japanese Standard Time (JST, UTC+9)
- * Uses date-fns and date-fns-tz for robust timezone handling.
+ * Uses date-fns for robust timezone handling.
  */
 
 /**
