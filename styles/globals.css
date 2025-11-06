@@ -26,6 +26,11 @@
   --ring: hsl(240 10% 3.9%);
   --radius: 0.6rem;
 
+  /* Neutral colors - Light mode */
+  --color-neutral-100: hsl(0 0% 98%);
+  --color-neutral-700: hsl(0 0% 27%);
+  --color-shimmering-text: var(--color-neutral-700);
+
   /* Artist colors - Light mode */
   --artist-nogizaka: 270 91% 55%;
   --artist-sakurazaka: 327 73% 77%;
@@ -53,6 +58,11 @@
   --input: hsl(240 3.7% 15.9%);
   --ring: hsl(240 4.9% 83.9%);
 
+  /* Neutral colors - Dark mode */
+  --color-neutral-100: hsl(0 0% 98%);
+  --color-neutral-700: hsl(0 0% 27%);
+  --color-shimmering-text: var(--color-neutral-100);
+
   /* Artist colors - Dark mode */
   --artist-nogizaka: 270 65% 75%;
   --artist-sakurazaka: 327 73% 77%;
@@ -79,10 +89,22 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-700: var(--color-neutral-700);
+  --color-shimmering-text: var(--color-shimmering-text);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    color: var(--color);
+  }
+  50% {
+    color: var(--shimmering-color);
+  }
 }
 
 @layer base {
