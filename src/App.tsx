@@ -34,17 +34,6 @@ function extractMembers(sessions: Map<number, Session>): Map<string, Member> {
   return members;
 }
 
-// Calculate total waiting people from waiting rooms
-function calculateTotalWaitingPeople(waitingRooms: Map<number, WaitingRoom[]>): number {
-  let total = 0;
-  waitingRooms.forEach((rooms) => {
-    rooms.forEach((room) => {
-      total += room.peopleCount;
-    });
-  });
-  return total;
-}
-
 // Map artist name to logo URL
 function getArtistLogo(artistName: string): string | null {
   const logoMap: Record<string, string> = {
@@ -78,7 +67,7 @@ export function App() {
   let [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
   let [waitingRooms, setWaitingRooms] = useState<Map<number, WaitingRoom[]>>(new Map());
-  let [totalWaitingPeople, setTotalWaitingPeople] = useState<number>(0);
+  let [participant, setParticipant] = useState<number>(0);
 
   let [members, setMembers] = useState<Map<string, Member>>(new Map());
 
@@ -120,7 +109,9 @@ export function App() {
         };
 
         setWaitingRooms(wr.waitingRooms);
-        setTotalWaitingPeople(calculateTotalWaitingPeople(wr.waitingRooms));
+        let thisRoom = wr.waitingRooms.get(defaultSessions.id) || [];
+        let participant = thisRoom.reduce((sum, room) => sum + room.peopleCount, 0);
+        setParticipant(participant);
         console.log("Fetched Waiting Rooms:", wr);
 
         // Update refresh times
@@ -153,7 +144,10 @@ export function App() {
       };
 
       setWaitingRooms(wr.waitingRooms);
-      setTotalWaitingPeople(calculateTotalWaitingPeople(wr.waitingRooms));
+      let thisRoom = wr.waitingRooms.get(targetSessionId) || [];
+      let total = thisRoom.reduce((sum, room) => sum + room.peopleCount, 0);
+      setParticipant(total);
+
       console.log("Refreshed Waiting Rooms:", wr);
 
       // Update refresh times
@@ -211,6 +205,9 @@ export function App() {
   useEffect(() => {
     if (selectedSession && !loading) {
       refreshWaitingRooms(selectedSession.id);
+
+
+
     }
   }, [selectedSession?.id]);
 
@@ -291,7 +288,7 @@ export function App() {
               console.log("Manual refresh triggered");
               refreshWaitingRooms();
             }}
-            totalWaitingPeople={totalWaitingPeople}
+            participant={participant}
           />
         </div>
 
