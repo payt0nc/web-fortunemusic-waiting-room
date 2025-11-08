@@ -10,10 +10,10 @@ interface StatsCardsProps {
   nextRefreshTime: Date;
   loading: boolean;
   onManualRefresh: () => void;
-  totalWaitingPeople: number;
+  participant: number;
 }
 
-export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onManualRefresh, totalWaitingPeople }: StatsCardsProps) {
+export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onManualRefresh, participant }: StatsCardsProps) {
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
@@ -26,7 +26,7 @@ export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onMa
         />
       )}
 
-      {/* Total Waiting People */}
+      {/* Total Participants */}
       <Card>
         <CardHeader>
           <CardTitle className="text-card-foreground flex flex-auto items-center justify-between">
@@ -35,7 +35,7 @@ export function StatsCards({ session, lastUpdate, nextRefreshTime, loading, onMa
               Participants
             </div>
             <span className="text-2xl font-bold text-blue-500">
-              {totalWaitingPeople.toLocaleString()}
+              {participant.toLocaleString()}
             </span>
           </CardTitle>
         </CardHeader>
