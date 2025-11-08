@@ -1,5 +1,6 @@
 import axios from "axios";
 import { parseISO, setHours, setMinutes, setSeconds, isValid, isAfter } from 'date-fns';
+import { toZonedTime, getTimezoneOffset, } from "date-fns-tz"
 
 export interface Event {
     id: number;
@@ -121,34 +122,10 @@ export async function fetchEvents(): Promise<Map<number, Event[]>> {
 
 
 export function concatEventTime(dt: string, t: string): Date {
-    let datetime = parseISO(dt);
-    if (!isValid(datetime)) {
-        throw new Error(`Invalid date string: ${dt}`);
-    }
-
-    const parts = t.split(':');
-    if (parts.length !== 3) {
-        throw new Error("Invalid time string format. Expected HH:MM:SS.");
-    }
-
-    const hours = parseInt(parts[0]!, 10);
-    const minutes = parseInt(parts[1]!, 10);
-    const seconds = parseInt(parts[2]!, 10);
-
-    // Validate the parsed values
-    if (isNaN(hours) || isNaN(minutes) || isNaN(seconds) ||
-        hours < 0 || hours > 23 ||
-        minutes < 0 || minutes > 59 ||
-        seconds < 0 || seconds > 59) {
-        throw new Error("Invalid time values in the string.");
-    }
-
-    // Set hours, minutes, and seconds using date-fns
-    datetime = setHours(datetime, hours);
-    datetime = setMinutes(datetime, minutes);
-    datetime = setSeconds(datetime, seconds);
-
-    return datetime;
+    const dateTimeString = dt ? `${dt} ${t}` : dt;
+    const jstDate = parseISO(`${dateTimeString}+09:00`);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return toZonedTime(jstDate, tz);
 }
 
 export function flatternMemberArray(memberArray: MemberArray[]): Map<string, Member> {
