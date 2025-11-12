@@ -85,7 +85,7 @@ function convertEventsToNavigationLinks(events: Map<number, Event[]>): Navbar02N
     let listItems: { href: string; label: string; description: string }[] = [];
     list.map((event) => {
       listItems.push({
-        href: `${event.id}`,
+        href: `${event.uniqueId}`,
         label: `${event.name}`,
         description: formatDate(event.date),
       });
@@ -358,7 +358,7 @@ const ListItem = React.forwardRef<
     icon?: string;
     type?: 'description' | 'simple' | 'icon';
     children?: React.ReactNode;
-    onEventSelect?: (eventId: string) => void;
+    onEventSelect?: (uniqueId: string) => void;
   }
 >(({ className, title, children, icon, type, href, onEventSelect, ...props }, ref) => {
   const renderIconComponent = (iconName?: string) => {

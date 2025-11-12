@@ -1,9 +1,11 @@
+import { concatUniqueEventID } from "@/utils/id";
 import axios from "axios";
 import { parseISO, setHours, setMinutes, setSeconds, isValid, isAfter } from 'date-fns';
 import { toZonedTime, getTimezoneOffset, } from "date-fns-tz"
 
 export interface Event {
     id: number;
+    uniqueId: string;
     name: string;
     artistName: string;
     photoUrl: string;
@@ -173,15 +175,20 @@ export function flatternEventArray(artistName: string, eventArray: EventArray[])
             // Check if event date is today or in the future
             if (isAfter(eventDt, now) || eventDt.toDateString() === now.toDateString()) {
                 let sessions = flatternTimezoneArray(date.dateDate, date.timeZoneArray);
-                let currentEvent: Event = {
-                    id: event.evtId,
-                    name: eventName,
-                    artistName: artistName,
-                    photoUrl: eventPhotoUrl,
-                    date: parseISO(date.dateDate),
-                    sessions: sessions,
-                };
-                events.push(currentEvent);
+                if (sessions.size > 0) {
+                    let firstSession = Array.from(sessions.values())[0];
+                    let currentEvent: Event = {
+                        id: event.evtId,
+                        uniqueId: concatUniqueEventID(event.evtId, firstSession!.id),
+                        name: eventName,
+                        artistName: artistName,
+                        photoUrl: eventPhotoUrl,
+                        date: parseISO(date.dateDate),
+                        sessions: sessions,
+                    };
+                    events.push(currentEvent);
+                }
+
             }
         });
         eventMap.set(event.evtId, events);

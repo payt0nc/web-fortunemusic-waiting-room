@@ -165,11 +165,11 @@ export function App() {
   };
 
   // Handle event selection from navbar
-  const handleEventSelect = (eventId: string) => {
+  const handleEventSelect = (uniqueId: string) => {
     // Find the event with the matching ID
     let foundEvent: Event | null = null;
     events.forEach((eventList: Event[]) => {
-      const event = eventList.find((e: Event) => e.id.toString() === eventId);
+      const event = eventList.find((e: Event) => e.uniqueId === uniqueId);
       if (event) {
         foundEvent = event;
       }
