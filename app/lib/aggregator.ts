@@ -1,4 +1,4 @@
-import type { Event } from "@/api/fortunemusic/events";
+import type { Event } from "@/api/fortunemusic/types";
 
 export function findNearestEvent(eventMap: Map<number, Event[]>, targetTime: Date): Event | null {
     let nearestEvent: Event | null = null;

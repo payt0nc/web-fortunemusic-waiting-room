@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Clock } from 'lucide-react';
 import { getPeopleCountColors, getWaitingTimeColors } from '@/lib/status-colors';
-import { type WaitingRoom } from '@/api/fortunemusic/waitingRooms';
-import { type Member } from '@/api/fortunemusic/events';
+import { type WaitingRoom } from '@/api/fortunemusic/types';
+import { type Member } from '@/api/fortunemusic/types';
 
 interface WaitingRoomGridProps {
   currentSessionID: number,

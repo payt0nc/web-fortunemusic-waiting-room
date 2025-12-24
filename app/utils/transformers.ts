@@ -1,5 +1,4 @@
-import type { Event, Session, Member } from "@/api/fortunemusic/events";
-import type { WaitingRooms, WaitingRoom } from "@/api/fortunemusic/waitingRooms";
+import type { Event, Session, Member, WaitingRooms, WaitingRoom } from "@/api/fortunemusic/types";
 
 export function serializeEvents(events: Map<number, Event[]>) {
   return Array.from(events.entries()).map(([k, v]) => [k, v.map(e => ({

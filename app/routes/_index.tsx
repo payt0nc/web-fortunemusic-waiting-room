@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData, useFetcher } from "@remix-run/react";
-import { fetchEvents, type Session, type Event, type Member } from "@/api/fortunemusic/events";
-import { fetchWaitingRooms, type WaitingRoom, type WaitingRooms } from "@/api/fortunemusic/waitingRooms";
+import { fetchEvents } from "@/api/fortunemusic/events";
+import { fetchWaitingRooms } from "@/api/fortunemusic/waitingRooms";
+import type { Event, Session, Member, WaitingRoom, WaitingRooms } from "@/api/fortunemusic/types";
 import { SessionSelector } from "@/components/SessionSelector";
 import { findNearestEvent } from "@/lib/aggregator";
 import { EventCard } from "@/components/EventCard";

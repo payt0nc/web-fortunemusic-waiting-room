@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle } from './ui/card';
 import { Users, Clock } from 'lucide-react';
-import type { Session } from '@/api/fortunemusic/events';
+import type { Session } from '@/api/fortunemusic/types';
 import { EventTimer } from './ui/timer-event';
 import { TimerProgress } from './ui/timer-progress';
 

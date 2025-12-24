@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { type Event } from '@/api/fortunemusic/events';
+import { type Event } from '@/api/fortunemusic/types';
 import { formatDate } from '@/utils/date';
 import { ThemeSwitcher } from '@/components/ui/shadcn-io/theme-switcher';
 import { GithubIcon } from '../../icons/lucide-github';
@@ -122,11 +122,15 @@ export const Navbar02 = ({
   const [isMobile, setIsMobile] = useState(false);
   const [navigationLinks, setNavigationLinks] = useState<Navbar02NavItem[]>([]);
   const containerRef = useRef<HTMLElement>(null);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
-    // Load theme from localStorage on initial render
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-    return savedTheme || 'system';
-  });
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+
+  useEffect(() => {
+      // Load theme from localStorage on client mount
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+      if (savedTheme) {
+        setTheme(savedTheme);
+      }
+  }, []);
 
   useEffect(() => {
     const checkWidth = () => {

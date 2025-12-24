@@ -1,189 +1,101 @@
 import { concatUniqueEventID } from "@/utils/id";
-import { parseISO, isAfter } from 'date-fns';
-import { toZonedTime } from "date-fns-tz"
+import { parseISO, isAfter, startOfDay } from 'date-fns';
+import { toZonedTime } from "date-fns-tz";
+import type { 
+    Event, Session, Member, 
+    EventArray, DateArray, TimeZoneArray, MemberArray 
+} from "./types";
 
-export interface Event {
-    id: number;
-    uniqueId: string;
-    name: string;
-    artistName: string;
-    photoUrl: string;
-    date: Date;
-    sessions: Map<number, Session>;
-}
-
-export interface Session {
-    id: number;
-    name: string;
-    sessionName: string;
-    startTime: Date;
-    endTime: Date;
-    members: Map<string, Member>;
-}
-
-export interface Member {
-    order: number;
-    name: string;
-    thumbnailUrl: string;
-    ticketCode: string;
-}
-
-interface EventArray {
-    evtId: number
-    evtCode: string
-    evtName: string
-    evtIsOnline: boolean
-    evtDisplayFrom: string
-    evtDisplayTo: string
-    evtSortNo: number
-    evtPhotUrl: string
-    evtPhotoUpdate: string
-    evtWebUrl: string
-    dateArray: DateArray[]
-}
-
-interface DateArray {
-    datePrefecture?: string
-    datePlace: string
-    dateDate: string
-    dateDayOfWeek: string
-    timeZoneArray: TimeZoneArray[]
-}
-
-interface TimeZoneArray {
-    tzId: number
-    tzName: string
-    tzStart: string
-    tzEnd: string
-    tzDisplay: string
-    tzUpdate: string
-    memberArray: MemberArray[]
-    hideWaitingInfo: boolean
-}
-
-interface MemberArray {
-    mbName: string
-    mbSortNo: number
-    mbPhotoUrl: string
-    mbPhotoUpdate: string
-    shCode: string
-    shName: string
-    shUseMulti?: number
-    showControlNo?: boolean
-    ticketArray?: TicketArray[]
-    isShowApp: boolean
-    ticketNumberLimit: number
-    showSerial: boolean
-    nextLane?: string
-    nicknameInputLimit?: number
-    nicknameInputText?: string
-    nicknameLabel?: string
-}
-
-interface TicketArray {
-    tkCode: string
-    tkName: string
-}
-
-const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46", "=LOVE"];
+const TARGET_ARTISTS = new Set(["乃木坂46", "櫻坂46", "日向坂46", "=LOVE"]);
+const API_URL = "https://api.fortunemusic.app/v1/appGetEventData/";
 
 export async function fetchEvents(): Promise<Map<number, Event[]>> {
-    const link = "https://api.fortunemusic.app/v1/appGetEventData/";
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+    
+    const data = await response.json();
+    const results = new Map<number, Event[]>();
 
-    try {
-        const response = await fetch(link);
-        if (!response.ok) {
-             throw new Error(`API returned ${response.status}`);
-        }
-        const data = await response.json();
-        let results: Map<number, Event[]> = new Map<number, Event[]>();
+    data.appGetEventResponse.artistArray
+        .filter((artist: any) => TARGET_ARTISTS.has(artist.artName))
+        .forEach((artist: any) => {
+            const events = transformEvents(artist.artName, artist.eventArray);
+            events.forEach((evList, id) => results.set(id, evList));
+        });
 
-        for (const artist of data.appGetEventResponse.artistArray) {
-            if (targetArtistNames.includes(artist.artName)) {
-                let events = flatternEventArray(artist.artName, artist.eventArray);
-                events.forEach((event, id) => {
-                    results.set(id, event);
-                });
-            };
-        }
-        return results;
-
-    } catch (error) {
-        console.error("Error fetching events:", error);
-        throw new Error(`Failed to fetch events: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    return results;
 }
 
+function transformEvents(artistName: string, eventArray: EventArray[]): Map<number, Event[]> {
+    const eventMap = new Map<number, Event[]>();
+    const now = startOfDay(new Date());
 
-export function concatEventTime(dt: string, t: string): Date {
+    eventArray.forEach(evt => {
+        const events: Event[] = evt.dateArray
+            .filter(d => {
+                const date = parseISO(d.dateDate);
+                return isAfter(date, now) || date.getTime() === now.getTime();
+            })
+            .map(d => createEventFromDate(artistName, evt, d))
+            .filter((e): e is Event => e !== null);
+
+        if (events.length > 0) {
+            eventMap.set(evt.evtId, events);
+        }
+    });
+
+    return eventMap;
+}
+
+function createEventFromDate(artistName: string, evt: EventArray, dateData: DateArray): Event | null {
+    const sessions = transformSessions(dateData.dateDate, dateData.timeZoneArray);
+    if (sessions.size === 0) return null;
+
+    const firstSessionId = sessions.keys().next().value;
+    return {
+        id: evt.evtId,
+        uniqueId: concatUniqueEventID(evt.evtId, firstSessionId!),
+        name: evt.evtName,
+        artistName,
+        photoUrl: evt.evtPhotUrl,
+        date: parseISO(dateData.dateDate),
+        sessions
+    };
+}
+
+function transformSessions(dateStr: string, timezones: TimeZoneArray[]): Map<number, Session> {
+    const sessions = new Map<number, Session>();
+    
+    timezones.forEach(tz => {
+        sessions.set(tz.tzId, {
+            id: tz.tzId,
+            name: tz.tzName,
+            sessionName: tz.tzName,
+            startTime: concatEventTime(dateStr, tz.tzStart),
+            endTime: concatEventTime(dateStr, tz.tzEnd),
+            members: transformMembers(tz.memberArray)
+        });
+    });
+
+    return sessions;
+}
+
+function transformMembers(members: MemberArray[]): Map<string, Member> {
+    const memberMap = new Map<string, Member>();
+    members.forEach(m => {
+        memberMap.set(m.shCode, {
+            order: m.mbSortNo,
+            name: m.mbName,
+            thumbnailUrl: m.mbPhotoUrl,
+            ticketCode: m.shCode
+        });
+    });
+    return memberMap;
+}
+
+function concatEventTime(dt: string, t: string): Date {
     const dateTimeString = dt ? `${dt} ${t}` : dt;
     const jstDate = parseISO(`${dateTimeString}+09:00`);
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return toZonedTime(jstDate, tz);
-}
-
-export function flatternMemberArray(memberArray: MemberArray[]): Map<string, Member> {
-    let membersMap: Map<string, Member> = new Map<string, Member>();
-    memberArray.forEach((member) => {
-        membersMap.set(member.shCode, {
-            order: member.mbSortNo,
-            name: member.mbName,
-            thumbnailUrl: member.mbPhotoUrl,
-            ticketCode: member.shCode,
-        });
-    });
-
-    return membersMap;
-}
-
-export function flatternTimezoneArray(dateDate: string, timezoneArray: TimeZoneArray[]): Map<number, Session> {
-    let sessions: Map<number, Session> = new Map<number, Session>();
-    timezoneArray.forEach((timezone) => {
-        let startAt = concatEventTime(dateDate, timezone.tzStart);
-        let endAt = concatEventTime(dateDate, timezone.tzEnd);
-        let session: Session = {
-            id: timezone.tzId,
-            name: timezone.tzName,
-            sessionName: timezone.tzName,
-            startTime: startAt,
-            endTime: endAt,
-            members: flatternMemberArray(timezone.memberArray),
-        }
-        sessions.set(timezone.tzId, session);
-    });
-    return sessions;
-}
-
-export function flatternEventArray(artistName: string, eventArray: EventArray[]): Map<number, Event[]> {
-    let eventMap: Map<number, Event[]> = new Map<number, Event[]>();
-
-    eventArray.forEach((event) => {
-        let events: Event[] = [];
-        let eventName = event.evtName;
-        let eventPhotoUrl = event.evtPhotUrl;
-        event.dateArray.forEach((date) => {
-            let eventDt = parseISO(date.dateDate);
-            const now = new Date();
-            // Check if event date is today or in the future
-            if (isAfter(eventDt, now) || eventDt.toDateString() === now.toDateString()) {
-                let sessions = flatternTimezoneArray(date.dateDate, date.timeZoneArray);
-                if (sessions.size > 0) {
-                    let firstSession = Array.from(sessions.values())[0];
-                    let currentEvent: Event = {
-                        id: event.evtId,
-                        uniqueId: concatUniqueEventID(event.evtId, firstSession!.id),
-                        name: eventName,
-                        artistName: artistName,
-                        photoUrl: eventPhotoUrl,
-                        date: parseISO(date.dateDate),
-                        sessions: sessions,
-                    };
-                    events.push(currentEvent);
-                }
-
-            }
-        });
-        eventMap.set(event.evtId, events);
-    });
-    return eventMap;
 }

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Session } from '@/api/fortunemusic/events';
+import type { Session } from '@/api/fortunemusic/types';
 
 interface SessionSelectorProps {
   id: number | null;

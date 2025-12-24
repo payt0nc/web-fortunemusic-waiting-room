@@ -1,6 +1,6 @@
 import { test, expect, describe } from "bun:test";
 import { findNearestEvent } from "./aggregator";
-import type { Event } from "@/api/fortunemusic/events";
+import type { Event } from "@/api/fortunemusic/types";
 
 describe("findNearestEvent", () => {
     test("should return null for empty event map", () => {
