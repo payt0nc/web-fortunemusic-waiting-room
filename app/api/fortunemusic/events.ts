@@ -1,7 +1,6 @@
 import { concatUniqueEventID } from "@/utils/id";
-import axios from "axios";
-import { parseISO, setHours, setMinutes, setSeconds, isValid, isAfter } from 'date-fns';
-import { toZonedTime, getTimezoneOffset, } from "date-fns-tz"
+import { parseISO, isAfter } from 'date-fns';
+import { toZonedTime } from "date-fns-tz"
 
 export interface Event {
     id: number;
@@ -89,15 +88,14 @@ interface TicketArray {
 const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46", "=LOVE"];
 
 export async function fetchEvents(): Promise<Map<number, Event[]>> {
-    // Use local proxy in development, CORS proxy for GitHub Pages deployment
-    const isProduction = process.env.NODE_ENV === 'production';
-    const link = isProduction
-        ? "https://corsproxy.io/?https://api.fortunemusic.app/v1/appGetEventData/"
-        : "/api/events"
+    const link = "https://api.fortunemusic.app/v1/appGetEventData/";
 
     try {
-        const response = await axios.get(link);
-        const data = response.data;
+        const response = await fetch(link);
+        if (!response.ok) {
+             throw new Error(`API returned ${response.status}`);
+        }
+        const data = await response.json();
         let results: Map<number, Event[]> = new Map<number, Event[]>();
 
         for (const artist of data.appGetEventResponse.artistArray) {
@@ -112,13 +110,7 @@ export async function fetchEvents(): Promise<Map<number, Event[]>> {
 
     } catch (error) {
         console.error("Error fetching events:", error);
-        if (axios.isAxiosError(error)) {
-            if (error.code === 'ERR_NETWORK') {
-                throw new Error('Network error: Unable to connect to FortuneMusic API. This may be due to CORS restrictions.');
-            }
-            throw new Error(`API error: ${error.response?.status || 'Unknown'} - ${error.message}`);
-        }
-        throw new Error(`Failed to fetch sessions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        throw new Error(`Failed to fetch events: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
 

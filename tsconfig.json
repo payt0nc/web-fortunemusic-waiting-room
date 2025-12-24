@@ -21,9 +21,11 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
+    "types": ["@remix-run/node", "vite/client"],
+
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./app/*"]
     },
 
     // Some stricter flags (disabled by default)

@@ -10,17 +10,16 @@ export interface WaitingRoom {
 }
 
 export async function fetchWaitingRooms(eventID: number): Promise<WaitingRooms> {
-    // Use local proxy in development, CORS proxy for GitHub Pages deployment
-    const isProduction = process.env.NODE_ENV === 'production';
-    const link = isProduction 
-        ? "https://corsproxy.io/?https://meets.fortunemusic.app/lapi/v5/app/dateTimezoneMessages"
-        : "/api/waitingrooms"
+    const link = "https://meets.fortunemusic.app/lapi/v5/app/dateTimezoneMessages";
 
     try {
         const response = await fetch(link, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
+                // Host header might be needed or handled automatically.
+                // In Bun/Node, Host is usually set from URL.
+                // "Host": "meets.fortunemusic.app", 
             },
             body: JSON.stringify({ "eventId": "e" + eventID })
         });
