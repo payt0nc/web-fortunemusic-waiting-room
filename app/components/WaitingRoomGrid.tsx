@@ -48,7 +48,6 @@ function joinMemberWaitingRoom(
 
 
 export function WaitingRoomGrid({ currentSessionID, waitingRooms, members }: WaitingRoomGridProps) {
-  console.log("WaitingRoomGrid Props:", { currentSessionID, waitingRooms, members });
   const rooms: room[] = joinMemberWaitingRoom(currentSessionID, waitingRooms, members);
 
   return (

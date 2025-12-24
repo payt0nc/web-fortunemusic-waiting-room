@@ -48,7 +48,7 @@ test("fetchWaitingRooms - should fetch and parse waiting rooms successfully", as
     // Verify fetch was called with correct parameters
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
-        "/api/waitingrooms",
+        "https://meets.fortunemusic.app/lapi/v5/app/dateTimezoneMessages",
         {
             method: "POST",
             headers: {
