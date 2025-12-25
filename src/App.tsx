@@ -17,9 +17,9 @@ import {
 import { CircleAlert } from 'lucide-react';
 
 import "./index.css";
-import nogizaka46Logo from "./assets/nogizaka46_logo.svg";
-import sakurazaka46Logo from "./assets/sakurazaka46_logo.svg";
-import hinatazaka46Logo from "./assets/hinatazaka46_logo.svg";
+import nogizaka46Logo from "./images/nogizaka46_logo.svg";
+import sakurazaka46Logo from "./images/sakurazaka46_logo.svg";
+import hinatazaka46Logo from "./images/hinatazaka46_logo.svg";
 import { Navbar02 } from "./components/ui/shadcn-io/navbar-02";
 
 
