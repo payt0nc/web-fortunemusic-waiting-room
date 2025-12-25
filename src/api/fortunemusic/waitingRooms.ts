@@ -10,7 +10,7 @@ export interface WaitingRoom {
 }
 
 export async function fetchWaitingRooms(eventID: number): Promise<WaitingRooms> {
-    const link = "https://proxy.n46.io/meets/events/rooms";
+    const link = "https://fm.proxies.n46.io/lapi/v5/app/dateTimezoneMessages";
     try {
         const response = await fetch(link, {
             method: "POST",
