@@ -1,8 +1,4 @@
-/**
- * CloudFlare Pages Functions Handler
- * Handles all routes and performs SSR using the server bundle
- */
-
+import { render } from "../src/entry.server";
 import pino from 'pino';
 
 const logger = pino({
@@ -133,10 +129,6 @@ export async function onRequest(context: EventContext<Env, any, any>) {
 
   // For all other routes, use SSR
   try {
-    // Import the server render function
-    // Note: This import path may need adjustment based on build output
-    const { render } = await import("./entry.server.js");
-
     const response = await render(request);
     return respond(response);
   } catch (error) {

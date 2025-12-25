@@ -4,22 +4,5 @@ compatibility_date = "2024-12-01"
 # CloudFlare Pages configuration
 pages_build_output_dir = "dist"
 
-[build]
-command = "bun run build-ssr.ts"
-
-# Environment variables (if needed)
-# [vars]
-# KEY = "value"
-
-# For local development with wrangler pages dev
-[[build.watch_paths]]
-src = "src/**/*"
-
-# KV Namespace bindings (if using KV for caching)
-# [[kv_namespaces]]
-# binding = "CACHE"
-# id = "your-kv-namespace-id"
-
 # Compatibility flags
-[compatibility_flags]
-nodejs_compat = true
+compatibility_flags = ["nodejs_compat"]
