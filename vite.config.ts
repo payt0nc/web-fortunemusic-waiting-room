@@ -15,4 +15,12 @@ export default defineConfig({
     tsconfigPaths(),
     tailwindcss(),
   ],
+  ssr: {
+    resolve: {
+      conditions: ["workerd", "worker", "browser"],
+    },
+  },
+  resolve: {
+    mainFields: ["browser", "module", "main"],
+  },
 });

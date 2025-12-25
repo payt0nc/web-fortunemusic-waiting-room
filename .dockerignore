@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+
+# Build outputs
+build
+dist
+.output
+.vercel
+
+# Development
+.env.local
+.env.development
+.env.test
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!CLAUDE.md
+DEPLOYMENT.md
+LICENSE
+
+# Docker
+docker
+Dockerfile
+.dockerignore
+
+# Misc
+.cache
+.temp
+coverage
+.eslintcache

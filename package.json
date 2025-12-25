@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "remix vite:dev",
     "build": "remix vite:build",
-    "start": "remix-serve ./build/server/index.js",
+    "build:cf": "remix vite:build",
+    "deploy": "bun run build:cf && wrangler pages deploy ./build/client",
+    "preview": "wrangler pages dev ./build/client",
+    "start": "bun run server.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -28,6 +31,8 @@
     "isbot": "^5.1.20",
     "lucide-react": "^0.552.0",
     "motion": "^12.23.24",
+    "pino": "^10.1.0",
+    "pino-http": "^11.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.3.1",
@@ -35,13 +40,16 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@remix-run/cloudflare": "^2.17.2",
+    "@remix-run/cloudflare-pages": "^2.17.2",
     "@remix-run/dev": "^2.15.2",
     "@tailwindcss/vite": "^4.0.0",
+    "@types/bun": "latest",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/bun": "latest",
     "typescript": "^5.7.3",
     "vite": "^5.4.11",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "wrangler": "^4.54.0"
   }
 }
