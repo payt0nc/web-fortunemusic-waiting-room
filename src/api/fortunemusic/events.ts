@@ -90,7 +90,7 @@ const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46", "=LOVE"];
 
 export async function fetchEvents(): Promise<Map<number, Event[]>> {
     // Use local proxy in development, CORS proxy for GitHub Pages deployment
-    const link = "https://proxy.n46.io/meets/events";
+    const link = "https://fm.proxies.n46.io/v1/appGetEventData/";
 
     try {
         const response = await axios.get(link);
