@@ -122,11 +122,17 @@ export const Navbar02 = ({
   const [isMobile, setIsMobile] = useState(false);
   const [navigationLinks, setNavigationLinks] = useState<Navbar02NavItem[]>([]);
   const containerRef = useRef<HTMLElement>(null);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
-    // Load theme from localStorage on initial render
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-    return savedTheme || 'system';
-  });
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+
+  // Load theme from localStorage after mount (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+      if (savedTheme) {
+        setTheme(savedTheme);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const checkWidth = () => {
@@ -155,6 +161,9 @@ export const Navbar02 = ({
 
   // Apply theme to document
   useEffect(() => {
+    // Skip on server-side
+    if (typeof window === 'undefined') return;
+
     const root = document.documentElement;
 
     // Save theme to localStorage

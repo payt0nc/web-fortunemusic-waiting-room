@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.tsx",
+    "dev:ssr": "bun run build:ssr && bun server-dev.tsx",
     "start": "NODE_ENV=production bun src/index.tsx",
-    "build": "bun run build.ts"
+    "build": "bun run build.ts",
+    "build:ssr": "bun run build-ssr.ts",
+    "preview": "bun run build:ssr && bunx wrangler pages dev dist",
+    "deploy": "bun run build:ssr && bunx wrangler pages deploy dist"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
@@ -25,15 +29,18 @@
     "date-fns-tz": "^3.2.0",
     "lucide-react": "^0.552.0",
     "motion": "^12.23.24",
+    "pino": "^10.1.0",
     "react": "^19",
     "react-dom": "^19",
+    "react-router": "^7.11.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251225.0",
+    "@types/bun": "latest",
     "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@types/bun": "latest"
+    "@types/react-dom": "^19"
   }
 }
