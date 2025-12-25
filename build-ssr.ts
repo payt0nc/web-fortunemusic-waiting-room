@@ -107,6 +107,12 @@ try {
     });
     console.log("✅ Favicon created\n");
   }
+
+  // Create dummy index.html for platform detection (Amplify/others)
+  // This satisfies the "No index.html detected" warning
+  await Bun.write(path.join(outdir, "index.html"), "<!DOCTYPE html><html><body>SSR App Starting...</body></html>");
+  console.log("✅ Dummy index.html created\n");
+
 } catch (err) {
   console.warn("⚠️ Warning: Could not copy static assets:", err);
 }
