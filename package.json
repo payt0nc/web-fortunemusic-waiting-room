@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun --hot src/index.tsx",
     "dev:ssr": "bun run build:ssr && bun server-dev.tsx",
-    "start": "NODE_ENV=production bun src/index.tsx",
+    "start": "node dist/server.js",
     "build": "bun run build.ts",
     "build:ssr": "bun run build-ssr.ts",
     "preview": "bun run build:ssr && bunx wrangler pages dev dist",
@@ -25,8 +25,10 @@
     "bun-plugin-tailwind": "^0.0.15",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "compression": "^1.8.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
+    "express": "^5.2.1",
     "lucide-react": "^0.552.0",
     "motion": "^12.23.24",
     "pino": "^10.1.0",
@@ -40,6 +42,8 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251225.0",
     "@types/bun": "latest",
+    "@types/compression": "^1.8.1",
+    "@types/express": "^5.0.6",
     "@types/react": "^19",
     "@types/react-dom": "^19"
   }

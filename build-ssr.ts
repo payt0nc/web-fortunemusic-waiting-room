@@ -52,18 +52,18 @@ if (!clientBuild.success) {
 
 console.log("✅ Client bundle built successfully\n");
 
-console.log("📦 Building server bundle (_worker.js)...\n");
+console.log("📦 Building server bundle (server.js)...\n");
 
-// Build server bundle (for CloudFlare Pages Advanced Mode)
+// Build server bundle (for Node.js / AWS Amplify)
 const serverBuild = await Bun.build({
-  entrypoints: ["functions/[[path]].ts"],
-  outdir: outdir, // Output to root of dist
-  target: "browser", // Browser target is safer for Cloudflare Workers
+  entrypoints: ["server.ts"],
+  outdir: outdir,
+  target: "node", // Target Node.js for Amplify
   minify: true,
   sourcemap: "linked",
   plugins: [plugin],
   naming: {
-    entry: "_worker.js", // Special name for Cloudflare Pages Advanced Mode
+    entry: "server.js",
   },
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
@@ -71,8 +71,9 @@ const serverBuild = await Bun.build({
   loader: {
     ".svg": "file",
   },
-  // External dependencies
-  external: [],
+  // External dependencies that should NOT be bundled
+  // We want to rely on node_modules for server deps in Amplify
+  external: ["express", "compression", "pino", "react", "react-dom", "react-router"],
 });
 
 if (!serverBuild.success) {
@@ -141,4 +142,4 @@ console.table(outputTable);
 console.log(`\n✅ SSR build completed in ${buildTime}ms\n`);
 console.log("📁 Output directory: dist/");
 console.log("  - dist/assets/      (client bundle + static files)");
-console.log("  - dist/_worker.js   (bundled worker for Cloudflare Pages)\n");
+console.log("  - dist/server.js    (Node.js server for AWS Amplify)\n");
