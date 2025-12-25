@@ -7,7 +7,7 @@
     "dev": "remix vite:dev",
     "build": "remix vite:build",
     "build:cf": "remix vite:build",
-    "deploy": "bun run build:cf && wrangler pages deploy ./build/client",
+    "deploy": "bun run build:cf && wrangler pages deploy ./build/client --project-name=web-fortunemusic-waiting-room",
     "preview": "wrangler pages dev ./build/client --compatibility-date=2024-12-25",
     "start": "bun run server.ts",
     "typecheck": "tsc"

@@ -2,9 +2,6 @@ name = "web-fortunemusic-waiting-room"
 compatibility_date = "2024-12-25"
 pages_build_output_dir = "./build/client"
 
-[env.production]
-# Production environment variables
-# Add your environment variables here
-
-[env.preview]
-# Preview environment variables
+# Cloudflare Pages configuration
+# The build command will be run by Cloudflare Pages
+# For manual deployment, use: wrangler pages deploy ./build/client --project-name=web-fortunemusic-waiting-room
