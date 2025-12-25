@@ -1,8 +1,6 @@
-name = "fortunemusic-waiting-room"
-compatibility_date = "2024-12-01"
+name = "web-fortunemusic-waiting-room"
+compatibility_date = "2025-12-25"
+compatibility_flags = ["nodejs_compat"]
 
 # CloudFlare Pages configuration
 pages_build_output_dir = "dist"
-
-# Compatibility flags
-compatibility_flags = ["nodejs_compat"]
