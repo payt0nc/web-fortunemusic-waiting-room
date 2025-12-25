@@ -17,7 +17,6 @@ if (existsSync(outdir)) {
 
 // Create dist directories
 await mkdir(path.join(outdir, "assets"), { recursive: true });
-await mkdir(path.join(outdir, "functions"), { recursive: true });
 
 console.log("📦 Building client bundle...\n");
 
@@ -38,6 +37,9 @@ const clientBuild = await Bun.build({
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
   },
+  loader: {
+    ".svg": "file",
+  },
 });
 
 if (!clientBuild.success) {
@@ -50,23 +52,26 @@ if (!clientBuild.success) {
 
 console.log("✅ Client bundle built successfully\n");
 
-console.log("📦 Building server bundle...\n");
+console.log("📦 Building server bundle (_worker.js)...\n");
 
-// Build server bundle (for CloudFlare Functions/Workers)
+// Build server bundle (for CloudFlare Pages Advanced Mode)
 const serverBuild = await Bun.build({
-  entrypoints: ["src/entry.server.tsx"],
-  outdir: path.join(outdir, "functions"),
-  target: "bun", // Bun runtime compatible with CloudFlare Workers
+  entrypoints: ["functions/[[path]].ts"],
+  outdir: outdir, // Output to root of dist
+  target: "browser", // Browser target is safer for Cloudflare Workers
   minify: true,
   sourcemap: "linked",
   plugins: [plugin],
   naming: {
-    entry: "[dir]/entry.server.[ext]",
+    entry: "_worker.js", // Special name for Cloudflare Pages Advanced Mode
   },
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
   },
-  // External dependencies that should be bundled differently
+  loader: {
+    ".svg": "file",
+  },
+  // External dependencies
   external: [],
 });
 
@@ -136,4 +141,4 @@ console.table(outputTable);
 console.log(`\n✅ SSR build completed in ${buildTime}ms\n`);
 console.log("📁 Output directory: dist/");
 console.log("  - dist/assets/      (client bundle + static files)");
-console.log("  - dist/functions/   (server bundle for CloudFlare)\n");
+console.log("  - dist/_worker.js   (bundled worker for Cloudflare Pages)\n");
