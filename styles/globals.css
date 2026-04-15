@@ -1,117 +1,110 @@
 @import "tailwindcss";
 
-@plugin "tailwindcss-animate";
-
-@custom-variant dark (&:is(.dark *));
-
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(240 10% 3.9%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 3.9%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 3.9%);
-  --primary: hsl(240 5.9% 10%);
-  --primary-foreground: hsl(0 0% 98%);
-  --secondary: hsl(240 4.8% 95.9%);
-  --secondary-foreground: hsl(240 5.9% 10%);
-  --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
-  --accent: hsl(240 4.8% 95.9%);
-  --accent-foreground: hsl(240 5.9% 10%);
-  --destructive: hsl(0 84.2% 60.2%);
-  --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 5.9% 90%);
-  --input: hsl(240 5.9% 90%);
-  --ring: hsl(240 10% 3.9%);
-  --radius: 0.6rem;
+  --bg-primary: #111111;
+  --bg-secondary: #161616;
+  --bg-card: #1A1A1A;
+  --border: #2E2E2E;
+  --text-primary: #FFFFFF;
+  --text-muted: #B8B9B6;
+  --text-subtitle: #666666;
+  --accent: #FF8400;
+  --accent-light: #ffb84d;
+  --artist-nogi: #a855f7;
+  --artist-sakura: #ec4899;
+  --artist-hinata: #38bdf8;
+  --status-green: #4ade80;
+  --status-blue: #38bdf8;
+  --status-yellow: #facc15;
+  --status-red: #f87171;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  /* Neutral colors - Light mode */
-  --color-neutral-100: hsl(0 0% 98%);
-  --color-neutral-700: hsl(0 0% 27%);
-  --color-shimmering-text: var(--color-neutral-700);
+  /* Badge backgrounds (with alpha) */
+  --badge-accent: #FF840022;
+  --badge-green: #174428;
+  --badge-blue: #0ea5e922;
+  --badge-yellow: #ca9a0422;
+  --badge-dark: #1e1e1e22;
 
-  /* Artist colors - Light mode */
-  --artist-nogizaka: 270 91% 55%;
-  --artist-sakurazaka: 327 73% 77%;
-  --artist-hinatazaka: 199 95% 62%;
-}
+  /* Active / highlight */
+  --active-bg: #FF840015;
+  --active-border: #FF8400;
 
-.dark {
-  --background: hsl(240 10% 3.9%);
-  --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 3.9%);
-  --card-foreground: hsl(0 0% 98%);
-  --popover: hsl(240 10% 3.9%);
-  --popover-foreground: hsl(0 0% 98%);
-  --primary: hsl(0 0% 98%);
-  --primary-foreground: hsl(240 5.9% 10%);
-  --secondary: hsl(240 3.7% 15.9%);
-  --secondary-foreground: hsl(0 0% 98%);
-  --muted: hsl(240 3.7% 15.9%);
-  --muted-foreground: hsl(240 5% 64.9%);
-  --accent: hsl(240 3.7% 15.9%);
-  --accent-foreground: hsl(0 0% 98%);
-  --destructive: hsl(0 62.8% 30.6%);
-  --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 3.7% 15.9%);
-  --input: hsl(240 3.7% 15.9%);
-  --ring: hsl(240 4.9% 83.9%);
-
-  /* Neutral colors - Dark mode */
-  --color-neutral-100: hsl(0 0% 98%);
-  --color-neutral-700: hsl(0 0% 27%);
-  --color-shimmering-text: var(--color-neutral-100);
-
-  /* Artist colors - Dark mode */
-  --artist-nogizaka: 270 65% 75%;
-  --artist-sakurazaka: 327 73% 77%;
-  --artist-hinatazaka: 199 89% 74%;
+  /* Error */
+  --error-bg: #371717;
+  --error: #f87171;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
+  --font-family-sans: var(--font-sans);
+  --font-family-mono: var(--font-mono);
+
+  /* Backgrounds */
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-card: var(--bg-card);
+
+  /* Border */
   --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-neutral-100: var(--color-neutral-100);
-  --color-neutral-700: var(--color-neutral-700);
-  --color-shimmering-text: var(--color-shimmering-text);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Text */
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtitle: var(--text-subtitle);
+
+  /* Accent */
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+
+  /* Artist */
+  --color-artist-nogi: var(--artist-nogi);
+  --color-artist-sakura: var(--artist-sakura);
+  --color-artist-hinata: var(--artist-hinata);
+
+  /* Status */
+  --color-status-green: var(--status-green);
+  --color-status-blue: var(--status-blue);
+  --color-status-yellow: var(--status-yellow);
+  --color-status-red: var(--status-red);
+
+  /* Badges */
+  --color-badge-accent: var(--badge-accent);
+  --color-badge-green: var(--badge-green);
+  --color-badge-blue: var(--badge-blue);
+  --color-badge-yellow: var(--badge-yellow);
+  --color-badge-dark: var(--badge-dark);
+
+  /* Active */
+  --color-active-bg: var(--active-bg);
+  --color-active-border: var(--active-border);
+
+  /* Error */
+  --color-error-bg: var(--error-bg);
+  --color-error: var(--error);
+
+  /* Font sizes */
+  --text-heading: 24px;
+  --text-heading--line-height: 1.2;
 }
 
-@keyframes shimmer {
-  0%, 100% {
-    color: var(--color);
-  }
-  50% {
-    color: var(--shimmering-color);
-  }
+* {
+  border-color: var(--border);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+body {
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
 }
