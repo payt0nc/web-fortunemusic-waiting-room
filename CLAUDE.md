@@ -9,7 +9,7 @@ Default to using Bun as the package manager and runtime.
 
 ## Framework
 
-This project uses **Astro** with React islands for the frontend.
+This project uses **Astro 6** with React 19 islands for the frontend. Static output mode (`output: 'static'`).
 
 - `bun run dev` -- Start the Astro dev server
 - `bun run build` -- Build for production (static output to `dist/`)
@@ -18,23 +18,28 @@ This project uses **Astro** with React islands for the frontend.
 ### Astro Structure
 
 - `src/pages/` -- Astro pages (`.astro` files)
-- `src/layouts/` -- Astro layouts
+- `src/layouts/` -- Astro layouts (`BaseLayout.astro`)
 - `src/components/` -- React components (used as islands with `client:only="react"`)
-- `src/hooks/` -- React custom hooks
-- `src/api/` -- API fetch logic (pure TypeScript, no framework dependency)
-- `src/lib/` -- Utility functions
+- `src/components/ui/` -- shadcn/ui primitives (Radix UI based)
+- `src/hooks/` -- React custom hooks (`useEvents`, `useWaitingRooms`, `useCountdown`, `useMediaQuery`)
+- `src/api/fortunemusic/` -- API fetch logic (Axios, pure TypeScript)
+- `src/lib/` -- Utility functions (`aggregator`, `status-colors`, `utils`)
 - `src/utils/` -- Date/ID/timezone helpers
-- `styles/globals.css` -- Global CSS with Tailwind and CSS variables
+- `styles/globals.css` -- Global CSS with Tailwind 4 and CSS variables
 
 ### React Islands
 
 The entire dashboard is a single React island (`Dashboard.tsx`) using `client:only="react"` because all data is fetched client-side from the FortuneMusic API.
 
+### Path Aliases
+
+The project uses `@/*` as a path alias for `./src/*` (configured in `tsconfig.json`).
+
 ## Testing
 
-Use `bun test` to run tests.
+Use `bun test` to run tests. Test files are co-located with source files (e.g., `events.test.ts`, `aggregator.test.ts`).
 
-```ts#index.test.ts
+```ts
 import { test, expect } from "bun:test";
 
 test("hello world", () => {
@@ -44,25 +49,13 @@ test("hello world", () => {
 
 ## Deployment
 
-### GitHub Actions CI/CD
+The site is deployed at `https://status.meet.oshi-katsu.app`.
 
-This project uses GitHub Actions for automated deployment to GitHub Pages.
-
-**Workflow:** `.github/workflows/release.yml`
-
-The workflow automatically:
-
-- Triggers on push to `main` branch
-- Sets up Bun environment
-- Installs dependencies with `bun install`
-- Builds the project with `bun run build` (Astro build)
-- Deploys to GitHub Pages
-
-**Manual deployment:**
+### Build
 
 ```sh
-# Build the project
 bun run build
-
 # Output will be in ./dist directory
 ```
+
+The `dist/` directory can be deployed to any static hosting service.
