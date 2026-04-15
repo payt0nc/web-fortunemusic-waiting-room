@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Clock } from 'lucide-react';
+import { Card, CardTitle } from './ui/card';
+import { Clock, Users } from 'lucide-react';
 import { getPeopleCountColors, getWaitingTimeColors } from '@/lib/status-colors';
+import { formatMS } from '@/utils/date';
 import { type WaitingRoom } from '@/api/fortunemusic/waitingRooms';
 import { type Member } from '@/api/fortunemusic/events';
 
@@ -24,23 +25,21 @@ function joinMemberWaitingRoom(
   waitingRooms: Map<number, WaitingRoom[]>,
   members: Map<string, Member>
 ): room[] {
-  let result: room[] = [];
-  for (let [sessionID, rooms] of waitingRooms) {
-    if (currentSessionID === sessionID) {
-      for (let room of rooms) {
-        let roomId = room.ticketCode;
-        if (members.has(roomId)) {
-          let member = members.get(roomId)!;
-          result.push({
-            id: roomId,
-            order: member.order,
-            name: member.name,
-            thumbnailUrl: member.thumbnailUrl,
-            waitingCount: room.peopleCount,
-            waitingTime: room.waitingTime,
-          });
-        }
-      }
+  const rooms = waitingRooms.get(currentSessionID);
+  if (!rooms) return [];
+
+  const result: room[] = [];
+  for (const room of rooms) {
+    const member = members.get(room.ticketCode);
+    if (member) {
+      result.push({
+        id: room.ticketCode,
+        order: member.order,
+        name: member.name,
+        thumbnailUrl: member.thumbnailUrl,
+        waitingCount: room.peopleCount,
+        waitingTime: room.waitingTime,
+      });
     }
   }
   return result;
@@ -48,43 +47,28 @@ function joinMemberWaitingRoom(
 
 
 export function WaitingRoomGrid({ currentSessionID, waitingRooms, members }: WaitingRoomGridProps) {
-  console.log("WaitingRoomGrid Props:", { currentSessionID, waitingRooms, members });
   const rooms: room[] = joinMemberWaitingRoom(currentSessionID, waitingRooms, members);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
+    <div className="w-full grid gap-[5px] p-[5px] grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
       {rooms.map((room) => (
         <Card
           key={room.id}
-          className="hover:shadow-md transition-all min-w-[200px] p-[5px]"
+          className="aspect-square hover:shadow-md transition-all flex flex-col items-center justify-between p-3"
         >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between mb-2">
-              <CardTitle className="text-card-foreground text-sm truncate">{room.name}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-center mb-3">
-              <div className={`text-3xl font-bold ${getPeopleCountColors(room.waitingCount).text}`}>
-                {room.waitingCount}
-              </div>
-              <div className="text-sm text-muted-foreground">people</div>
-            </div>
-            <div className="text-center">
-              <div className={`flex items-center justify-center gap-1 ${getWaitingTimeColors(room.waitingTime).text}`}>
-                <Clock className="h-4 w-4" />
-                <span className="text-lg font-semibold font-mono">
-                  {(() => {
-                    const totalSeconds = Math.floor(room.waitingTime);
-                    const minutes = Math.floor(totalSeconds / 60);
-                    const seconds = totalSeconds % 60;
-                    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                  })()}
-                </span>
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">wait time</div>
-            </div>
-          </CardContent>
+          <CardTitle className="text-sm truncate text-center w-full text-text-muted">{room.name}</CardTitle>
+          <div className={`flex items-center justify-center gap-1 ${getPeopleCountColors(room.waitingCount).text}`}>
+            <Users className="h-5 w-5" />
+            <span className="text-3xl font-bold">
+              {room.waitingCount}
+            </span>
+          </div>
+          <div className={`flex items-center justify-center gap-1 ${getWaitingTimeColors(room.waitingTime).text}`}>
+            <Clock className="h-4 w-4" />
+            <span className="text-lg font-semibold font-mono">
+              {formatMS(room.waitingTime)}
+            </span>
+          </div>
         </Card>
       ))}
     </div>
