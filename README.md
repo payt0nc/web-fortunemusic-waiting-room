@@ -1,11 +1,13 @@
 # FortuneMusic Waiting Room
 
-A web application for displaying FortuneMusic event information and waiting room details, built with Bun, React, TypeScript, and Tailwind CSS.
+A web application for displaying FortuneMusic event information and waiting room details, built with Astro, React, TypeScript, and Tailwind CSS.
+
+**Live site:** <https://status.meet.oshi-katsu.app>
 
 ## Features
 
 - Event browsing and selection
-- Waiting room information display
+- Waiting room information display with countdown timers
 - Real-time event data from FortuneMusic API
 - Responsive design with shadcn/ui components
 
@@ -24,10 +26,8 @@ bun install
 ### Start Development Server
 
 ```bash
-bun dev
+bun run dev
 ```
-
-The development server will start with hot module replacement enabled.
 
 ### Build for Production
 
@@ -37,66 +37,43 @@ bun run build
 
 The built files will be output to the `./dist` directory.
 
-### Run Production Build
+### Preview Production Build
 
 ```bash
-bun start
+bun run preview
 ```
 
 ## Deployment
 
-### Automated Deployment (GitHub Actions)
-
-This project is configured with GitHub Actions for automatic deployment to GitHub Pages.
-
-**Setup Instructions:**
-
-1. Go to your GitHub repository settings
-2. Navigate to **Settings** → **Pages**
-3. Under **Source**, select **GitHub Actions**
-4. Push to the `main` branch to trigger automatic deployment
-
-The workflow will:
-
-- Build the project using Bun
-- Deploy to GitHub Pages
-- Make your site available at `https://<username>.github.io/<repository>`
-
-### Manual Deployment
-
-Build the project and deploy the `dist` folder to any static hosting service:
-
-```bash
-bun run build
-# Deploy the ./dist directory
-```
-
-### CORS Considerations
-
-The FortuneMusic API does not support CORS for browser requests. See [DEPLOYMENT.md](./DEPLOYMENT.md) for solutions including CORS proxies and Cloudflare Workers.
+Build the project and deploy the `dist/` folder to any static hosting service.
 
 ## Technology Stack
 
-- **Runtime:** Bun
-- **Framework:** React 19
+- **Runtime:** [Bun](https://bun.sh)
+- **Framework:** [Astro](https://astro.build) 6 (static output) with [React](https://react.dev) 19 islands
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS 4
-- **UI Components:** shadcn/ui (Radix UI)
-- **Build:** Bun's native bundler
+- **Styling:** [Tailwind CSS](https://tailwindcss.com) 4
+- **UI Components:** [shadcn/ui](https://ui.shadcn.com) (Radix UI)
+- **HTTP Client:** Axios
+- **Date Utilities:** date-fns / date-fns-tz
 
 ## Project Structure
 
 ```text
 ├── src/
-│   ├── api/           # API integration
-│   ├── components/    # React components
-│   ├── lib/          # Utilities and helpers
-│   └── index.html    # Entry point
-├── .github/
-│   └── workflows/    # GitHub Actions
-└── dist/             # Build output
+│   ├── api/fortunemusic/  # API fetch logic
+│   ├── components/        # React island components
+│   │   └── ui/            # shadcn/ui primitives
+│   ├── hooks/             # React custom hooks
+│   ├── layouts/           # Astro layouts
+│   ├── lib/               # Utility functions
+│   ├── pages/             # Astro pages
+│   └── utils/             # Date/ID/timezone helpers
+├── styles/                # Global CSS
+├── public/                # Static assets
+└── dist/                  # Build output
 ```
 
 ## License
 
-This project was created using `bun init` in bun v1.2.19. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+[MIT](./LICENSE)
