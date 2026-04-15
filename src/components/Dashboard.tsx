@@ -11,7 +11,7 @@ import { Menu, X } from 'lucide-react';
 
 const MIN_SIDEBAR_WIDTH = 240;
 const MAX_SIDEBAR_WIDTH = 600;
-const DEFAULT_SIDEBAR_WIDTH = 400;
+const DEFAULT_SIDEBAR_WIDTH = 300;
 
 export function Dashboard() {
   const isMobile = useIsMobile();
@@ -102,9 +102,8 @@ export function Dashboard() {
             />
           )}
           <div
-            className={`fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-200 ease-in-out ${
-              sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
+            className={`fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-200 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
           >
             <Sidebar
               events={events}
