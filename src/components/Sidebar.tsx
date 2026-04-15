@@ -125,7 +125,7 @@ export function Sidebar({ events, activeEventId, onEventSelect, width }: Sidebar
               {/* Artist group header */}
               <button
                 onClick={() => toggleGroup(group.artistName)}
-                className={`flex items-center gap-2 h-9 px-3 cursor-pointer transition-colors hover:opacity-80 ${group.colorClass}`}
+                className={`flex items-center gap-2 h-11 lg:h-9 px-3 cursor-pointer transition-colors hover:opacity-80 ${group.colorClass}`}
               >
                 {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 <span className="text-sm font-semibold">
@@ -147,7 +147,7 @@ export function Sidebar({ events, activeEventId, onEventSelect, width }: Sidebar
                   {group.dateGroups.map((dateGroup) => (
                     <div key={dateGroup.dateKey} className="flex flex-col">
                       {/* Date sub-header */}
-                      <div className="flex items-center gap-1.5 h-7 px-3">
+                      <div className="flex items-center gap-1.5 h-9 lg:h-7 px-3">
                         <Calendar size={10} className="text-text-subtitle" />
                         <span className="text-sm font-medium font-mono text-text-subtitle">
                           {dateGroup.dateLabel}
@@ -161,7 +161,7 @@ export function Sidebar({ events, activeEventId, onEventSelect, width }: Sidebar
                           <button
                             key={event.uniqueId}
                             onClick={() => onEventSelect(event.uniqueId)}
-                            className={`flex items-center gap-2 h-9 px-3 text-left transition-colors cursor-pointer overflow-hidden border-l-2 ${
+                            className={`flex items-center gap-2 h-11 lg:h-9 px-3 text-left transition-colors cursor-pointer overflow-hidden border-l-2 ${
                               isActive
                                 ? 'bg-active-bg border-l-active-border text-accent'
                                 : 'border-l-transparent text-text-muted'

@@ -27,33 +27,33 @@ function getTimerColors(phase: CountdownPhase, remainingSeconds: number): { bg: 
   }
 }
 
+const badgeClass = 'flex items-center justify-center gap-1 rounded-full px-2 lg:px-2.5 py-0.5 whitespace-nowrap tabular-nums text-xs lg:text-sm font-semibold';
+const iconClass = 'h-3.5 w-3.5 lg:h-4 lg:w-4';
+
 export function StatsBar({ session, participant, refreshCountdown }: StatsBarProps) {
   const countdown = useCountdown(session?.startTime, session?.endTime);
   const timerColors = getTimerColors(countdown.phase, countdown.remainingSeconds);
 
   return (
-    <div className="flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-badge-dark">
-      {/* Timer badge */}
-      <div className={`relative flex items-center justify-center gap-1 rounded-full px-2.5 py-0.5 min-w-[180px] whitespace-nowrap tabular-nums overflow-hidden ${timerColors.text} text-sm font-semibold`}>
+    <div className="flex items-center gap-1 lg:gap-1.5 rounded-full px-1.5 lg:px-2.5 py-1 bg-badge-dark">
+      <div className={`relative overflow-hidden ${badgeClass} ${timerColors.text}`}>
         {countdown.phase === 'during' && (
           <div
             className={`absolute inset-0 ${timerColors.bg} transition-[width] duration-1000 ease-linear`}
             style={{ width: `${countdown.progress * 100}%` }}
           />
         )}
-        <Hourglass className="relative h-4 w-4" />
+        <Hourglass className={`relative ${iconClass}`} />
         <span className="relative">{countdown.timeText}</span>
       </div>
 
-      {/* Refresh badge */}
-      <div className="flex items-center justify-center gap-1 rounded-full px-2.5 py-0.5 min-w-[130px] whitespace-nowrap tabular-nums text-status-yellow text-sm font-semibold">
-        <TimerReset className="h-4 w-4" />
+      <div className={`${badgeClass} text-status-yellow`}>
+        <TimerReset className={iconClass} />
         <span>{String(refreshCountdown).padStart(2, '0')}s</span>
       </div>
 
-      {/* Participant badge */}
-      <div className="flex items-center justify-center gap-1 rounded-full px-2.5 py-0.5 min-w-[100px] whitespace-nowrap tabular-nums text-status-blue text-sm font-semibold">
-        <UsersRound className="h-4 w-4" />
+      <div className={`${badgeClass} text-status-blue`}>
+        <UsersRound className={iconClass} />
         <span>{participant.toLocaleString()}</span>
       </div>
     </div>

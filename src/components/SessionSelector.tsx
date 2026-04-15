@@ -10,14 +10,14 @@ export function SessionSelector({ id, sessions, onSessionSelect }: SessionSelect
   if (sessions.size === 0) return null;
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap rounded-full px-2.5 py-1 bg-badge-accent">
+    <div className="flex items-center gap-1.5 flex-wrap rounded-xl lg:rounded-full px-2.5 py-1.5 lg:py-1 bg-badge-accent">
       {Array.from(sessions.entries()).map(([sessionId, session]) => {
         const isActive = id === sessionId;
         return (
           <button
             key={sessionId}
             onClick={() => onSessionSelect(sessionId)}
-            className={`rounded-full px-2.5 py-0.5 text-sm font-semibold transition-colors cursor-pointer ${
+            className={`rounded-full px-3 py-1.5 lg:px-2.5 lg:py-0.5 text-sm font-semibold transition-colors cursor-pointer ${
               isActive
                 ? 'bg-accent text-text-primary'
                 : 'bg-badge-accent text-accent'
