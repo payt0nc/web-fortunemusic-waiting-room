@@ -10,23 +10,23 @@
   },
   "dependencies": {
     "@astrojs/react": "^5.0.3",
-    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-slot": "^1.2.4",
     "astro": "^6.1.7",
-    "axios": "^1.13.1",
+    "axios": "^1.15.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "lucide-react": "^1.8.0",
-    "react": "^19",
-    "react-dom": "^19",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.11",
-    "@tailwindcss/vite": "^4.1.11"
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2",
+    "@tailwindcss/vite": "^4.2.2"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/react": "^19",
-    "@types/react-dom": "^19"
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
   }
 }
