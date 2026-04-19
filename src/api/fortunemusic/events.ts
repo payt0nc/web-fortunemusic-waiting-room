@@ -86,7 +86,7 @@ interface TicketArray {
     tkName: string
 }
 
-const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46", "=LOVE"];
+const targetArtistNames = ["乃木坂46", "櫻坂46", "日向坂46", "=LOVE", "与田祐希"];
 
 export async function fetchEvents(): Promise<Map<number, Event[]>> {
     // Use local proxy in development, CORS proxy for GitHub Pages deployment
