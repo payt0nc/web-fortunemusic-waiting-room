@@ -24,11 +24,11 @@ export function EventCard({ name, date }: EventCardProps) {
 
         {/* Event name row */}
         <div className="flex items-center gap-3">
-          <span
+          <h1
             className="text-lg lg:text-heading font-bold font-mono bg-gradient-to-r from-accent via-accent-light to-accent bg-clip-text text-transparent"
           >
             {name || '---'}
-          </span>
+          </h1>
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@
   --border: #2E2E2E;
   --text-primary: #FFFFFF;
   --text-muted: #B8B9B6;
-  --text-subtitle: #666666;
+  --text-subtitle: #8A8A8A;
   --accent: #FF8400;
   --accent-light: #ffb84d;
   --artist-nogi: #a855f7;
@@ -90,6 +90,27 @@
 
 * {
   border-color: var(--border);
+}
+
+/* Visible keyboard focus for all interactive elements */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {

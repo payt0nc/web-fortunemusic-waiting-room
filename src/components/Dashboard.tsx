@@ -13,6 +13,22 @@ const MIN_SIDEBAR_WIDTH = 240;
 const MAX_SIDEBAR_WIDTH = 600;
 const DEFAULT_SIDEBAR_WIDTH = 300;
 
+function GridSkeleton() {
+  return (
+    <div
+      className="w-full grid gap-[5px] p-[5px] grid-cols-[repeat(auto-fill,minmax(140px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]"
+      aria-hidden="true"
+    >
+      {Array.from({ length: 12 }).map((_, i) => (
+        <div
+          key={i}
+          className="aspect-square rounded-xl border border-border bg-bg-card animate-pulse"
+        />
+      ))}
+    </div>
+  );
+}
+
 export function Dashboard() {
   const isMobile = useIsMobile();
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
@@ -91,7 +107,7 @@ export function Dashboard() {
   }, [handleEventSelect, isMobile]);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-dvh overflow-hidden">
       {/* Mobile: overlay sidebar + backdrop */}
       {isMobile && (
         <>
@@ -155,12 +171,6 @@ export function Dashboard() {
           </div>
         )}
 
-        {/* Loading */}
-        {loading && (
-          <div className="mx-4 lg:mx-8 mt-4 lg:mt-8 p-4">
-            <p className="text-text-muted">Loading events...</p>
-          </div>
-        )}
 
         {/* Notice */}
         {notice && (
@@ -194,11 +204,18 @@ export function Dashboard() {
           </div>
 
           {/* Waiting Room Grid */}
-          <WaitingRoomGrid
-            currentSessionID={selectedSession?.id || 0}
-            waitingRooms={waitingRooms}
-            members={members}
-          />
+          {loading ? (
+            <div className="w-full" role="status" aria-label="Loading events">
+              <span className="sr-only">Loading events…</span>
+              <GridSkeleton />
+            </div>
+          ) : (
+            <WaitingRoomGrid
+              currentSessionID={selectedSession?.id || 0}
+              waitingRooms={waitingRooms}
+              members={members}
+            />
+          )}
         </div>
       </main>
     </div>
