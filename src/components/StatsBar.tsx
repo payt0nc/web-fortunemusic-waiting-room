@@ -35,25 +35,33 @@ export function StatsBar({ session, participant, refreshCountdown }: StatsBarPro
   const timerColors = getTimerColors(countdown.phase, countdown.remainingSeconds);
 
   return (
-    <div className="flex items-center gap-1 lg:gap-1.5 rounded-full px-1.5 lg:px-2.5 py-1 bg-badge-dark">
-      <div className={`relative overflow-hidden ${badgeClass} ${timerColors.text}`}>
+    <div
+      className="flex items-center gap-1 lg:gap-1.5 rounded-full px-1.5 lg:px-2.5 py-1 bg-badge-dark"
+      role="status"
+      aria-live="polite"
+    >
+      <div
+        className={`relative overflow-hidden ${badgeClass} ${timerColors.text}`}
+        aria-label={`Session time: ${countdown.timeText}`}
+      >
         {countdown.phase === 'during' && (
           <div
-            className={`absolute inset-0 ${timerColors.bg} transition-[width] duration-1000 ease-linear`}
-            style={{ width: `${countdown.progress * 100}%` }}
+            className={`absolute inset-0 origin-left ${timerColors.bg} transition-transform duration-1000 ease-linear`}
+            style={{ transform: `scaleX(${countdown.progress})` }}
+            aria-hidden="true"
           />
         )}
-        <Hourglass className={`relative ${iconClass}`} />
+        <Hourglass className={`relative ${iconClass}`} aria-hidden="true" />
         <span className="relative">{countdown.timeText}</span>
       </div>
 
-      <div className={`${badgeClass} text-status-yellow`}>
-        <TimerReset className={iconClass} />
+      <div className={`${badgeClass} text-status-yellow`} aria-label={`Refreshing in ${refreshCountdown} seconds`}>
+        <TimerReset className={iconClass} aria-hidden="true" />
         <span>{String(refreshCountdown).padStart(2, '0')}s</span>
       </div>
 
-      <div className={`${badgeClass} text-status-blue`}>
-        <UsersRound className={iconClass} />
+      <div className={`${badgeClass} text-status-blue`} aria-label={`${participant.toLocaleString()} participants`}>
+        <UsersRound className={iconClass} aria-hidden="true" />
         <span>{participant.toLocaleString()}</span>
       </div>
     </div>
