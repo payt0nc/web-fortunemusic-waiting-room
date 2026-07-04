@@ -10,16 +10,21 @@ export function SessionSelector({ id, sessions, onSessionSelect }: SessionSelect
   if (sessions.size === 0) return null;
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap rounded-xl lg:rounded-full px-2.5 py-1.5 lg:py-1 bg-badge-accent">
+    <div
+      className="flex items-center gap-1.5 flex-wrap rounded-xl lg:rounded-full px-2.5 py-1.5 lg:py-1 bg-badge-accent"
+      role="group"
+      aria-label="Session selector"
+    >
       {Array.from(sessions.entries()).map(([sessionId, session]) => {
         const isActive = id === sessionId;
         return (
           <button
             key={sessionId}
             onClick={() => onSessionSelect(sessionId)}
-            className={`rounded-full px-3 py-1.5 lg:px-2.5 lg:py-0.5 text-sm font-semibold transition-colors cursor-pointer ${
+            aria-pressed={isActive}
+            className={`inline-flex items-center justify-center min-h-11 lg:min-h-9 rounded-full px-3 py-1.5 lg:px-3.5 lg:py-1 text-sm font-semibold transition-colors cursor-pointer ${
               isActive
-                ? 'bg-accent text-text-primary'
+                ? 'bg-accent text-bg-primary'
                 : 'bg-badge-accent text-accent'
             }`}
           >
