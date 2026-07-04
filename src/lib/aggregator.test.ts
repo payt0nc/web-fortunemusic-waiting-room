@@ -1,6 +1,57 @@
 import { test, expect, describe } from "bun:test";
-import { findNearestEvent } from "./aggregator";
-import type { Event } from "@/api/fortunemusic/events";
+import { findCurrentSession, findNearestEvent } from "./aggregator";
+import type { Event, Session } from "@/api/fortunemusic/events";
+
+function makeSession(
+    id: number,
+    start: string,
+    end: string,
+): Session {
+    return {
+        id,
+        name: `Session ${id}`,
+        sessionName: `Session ${id}`,
+        startTime: new Date(start),
+        endTime: new Date(end),
+        members: new Map(),
+    };
+}
+
+describe("findCurrentSession", () => {
+    test("returns null for empty sessions", () => {
+        expect(findCurrentSession(new Map(), new Date())).toBeNull();
+    });
+
+    test("returns the active session when one is in progress", () => {
+        const sessions = new Map([
+            [1, makeSession(1, "2024-01-15T10:00:00", "2024-01-15T12:00:00")],
+            [2, makeSession(2, "2024-01-15T14:00:00", "2024-01-15T16:00:00")],
+        ]);
+
+        const result = findCurrentSession(sessions, new Date("2024-01-15T14:30:00"));
+        expect(result?.id).toBe(2);
+    });
+
+    test("returns the next upcoming session when between sessions", () => {
+        const sessions = new Map([
+            [1, makeSession(1, "2024-01-15T10:00:00", "2024-01-15T12:00:00")],
+            [2, makeSession(2, "2024-01-15T14:00:00", "2024-01-15T16:00:00")],
+        ]);
+
+        const result = findCurrentSession(sessions, new Date("2024-01-15T13:00:00"));
+        expect(result?.id).toBe(2);
+    });
+
+    test("returns the most recent session when all sessions are past", () => {
+        const sessions = new Map([
+            [1, makeSession(1, "2024-01-15T10:00:00", "2024-01-15T12:00:00")],
+            [2, makeSession(2, "2024-01-15T14:00:00", "2024-01-15T16:00:00")],
+        ]);
+
+        const result = findCurrentSession(sessions, new Date("2024-01-15T18:00:00"));
+        expect(result?.id).toBe(2);
+    });
+});
 
 describe("findNearestEvent", () => {
     test("should return null for empty event map", () => {
@@ -288,5 +339,83 @@ describe("findNearestEvent", () => {
         const targetTime = new Date("2024-01-15T13:00:00");
         const result = findNearestEvent(eventMap, targetTime);
         expect(result).toBe(eventWithSessions);
+    });
+
+    test("prefers n46 over s46 and h46 when sessions start at the same time", () => {
+        const sameStart = new Date("2024-01-15T14:00:00");
+        const sameEnd = new Date("2024-01-15T16:00:00");
+
+        const nogiEvent: Event = {
+            id: 1,
+            uniqueId: "1-1",
+            name: "Nogi Event",
+            artistName: "乃木坂46",
+            photoUrl: "https://example.com/nogi.jpg",
+            date: new Date("2024-01-15"),
+            sessions: new Map([[1, makeSession(1, sameStart.toISOString(), sameEnd.toISOString())]]),
+        };
+
+        const sakuraEvent: Event = {
+            id: 2,
+            uniqueId: "2-1",
+            name: "Sakura Event",
+            artistName: "櫻坂46",
+            photoUrl: "https://example.com/sakura.jpg",
+            date: new Date("2024-01-15"),
+            sessions: new Map([[1, makeSession(1, sameStart.toISOString(), sameEnd.toISOString())]]),
+        };
+
+        const hinataEvent: Event = {
+            id: 3,
+            uniqueId: "3-1",
+            name: "Hinata Event",
+            artistName: "日向坂46",
+            photoUrl: "https://example.com/hinata.jpg",
+            date: new Date("2024-01-15"),
+            sessions: new Map([[1, makeSession(1, sameStart.toISOString(), sameEnd.toISOString())]]),
+        };
+
+        const eventMap = new Map([
+            [2, [sakuraEvent]],
+            [3, [hinataEvent]],
+            [1, [nogiEvent]],
+        ]);
+
+        const result = findNearestEvent(eventMap, new Date("2024-01-15T13:00:00"));
+        expect(result).toBe(nogiEvent);
+    });
+
+    test("prefers the event with an active session over an upcoming one", () => {
+        const activeEvent: Event = {
+            id: 1,
+            uniqueId: "1-1",
+            name: "Active Event",
+            artistName: "櫻坂46",
+            photoUrl: "https://example.com/active.jpg",
+            date: new Date("2024-01-15"),
+            sessions: new Map([
+                [1, makeSession(1, "2024-01-15T13:00:00", "2024-01-15T15:00:00")],
+            ]),
+        };
+
+        const upcomingEvent: Event = {
+            id: 2,
+            uniqueId: "2-1",
+            name: "Upcoming Event",
+            artistName: "乃木坂46",
+            photoUrl: "https://example.com/upcoming.jpg",
+            date: new Date("2024-01-15"),
+            sessions: new Map([
+                [1, makeSession(1, "2024-01-15T13:30:00", "2024-01-15T15:30:00")],
+            ]),
+        };
+
+        const eventMap = new Map([
+            [1, [activeEvent]],
+            [2, [upcomingEvent]],
+        ]);
+
+        const result = findNearestEvent(eventMap, new Date("2024-01-15T14:00:00"));
+        expect(result).toBe(activeEvent);
     });
 });

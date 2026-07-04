@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchEvents, type Event, type Session, type Member } from '@/api/fortunemusic/events';
-import { findNearestEvent } from '@/lib/aggregator';
+import { findCurrentSession, findNearestEvent } from '@/lib/aggregator';
 
 function extractMembers(sessions: Map<number, Session>): Map<string, Member> {
   const members = new Map<string, Member>();
@@ -35,8 +35,7 @@ export function useEvents() {
         setSelectedEvent(defaultEvent);
         setSessions(defaultEvent.sessions);
 
-        const k = defaultEvent.sessions.keys().next().value!;
-        const defaultSession = defaultEvent.sessions.get(k)!;
+        const defaultSession = findCurrentSession(defaultEvent.sessions, current)!;
         setSelectedSession(defaultSession);
 
         const existedMembers = extractMembers(defaultEvent.sessions);
@@ -68,12 +67,9 @@ export function useEvents() {
       const updatedMembers = extractMembers(selectedEventData.sessions);
       setMembers(updatedMembers);
 
-      const firstSessionKey = selectedEventData.sessions.keys().next().value;
-      if (firstSessionKey !== undefined) {
-        const firstSession = selectedEventData.sessions.get(firstSessionKey);
-        if (firstSession) {
-          setSelectedSession(firstSession);
-        }
+      const currentSession = findCurrentSession(selectedEventData.sessions, new Date());
+      if (currentSession) {
+        setSelectedSession(currentSession);
       }
     }
   };
