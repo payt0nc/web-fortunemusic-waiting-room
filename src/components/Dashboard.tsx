@@ -16,13 +16,13 @@ const DEFAULT_SIDEBAR_WIDTH = 300;
 function GridSkeleton() {
   return (
     <div
-      className="w-full grid gap-[5px] p-[5px] grid-cols-[repeat(auto-fill,minmax(140px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]"
+      className="w-full grid gap-[5px] p-[5px] grid-cols-[repeat(auto-fill,minmax(190px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]"
       aria-hidden="true"
     >
       {Array.from({ length: 12 }).map((_, i) => (
         <div
           key={i}
-          className="aspect-square rounded-xl border border-border bg-bg-card animate-pulse"
+          className="h-[84px] rounded-xl border border-border bg-bg-card animate-pulse"
         />
       ))}
     </div>
@@ -96,10 +96,12 @@ export function Dashboard() {
 
   const {
     waitingRooms,
+    history,
+    historyAvailable,
     participant,
     notice,
     refreshCountdown,
-  } = useWaitingRooms(selectedSession, loading);
+  } = useWaitingRooms(selectedSession, selectedEvent, loading);
 
   const handleEventSelectMobile = useCallback((uniqueId: string) => {
     handleEventSelect(uniqueId);
@@ -212,8 +214,11 @@ export function Dashboard() {
           ) : (
             <WaitingRoomGrid
               currentSessionID={selectedSession?.id || 0}
+              session={selectedSession}
               waitingRooms={waitingRooms}
               members={members}
+              history={history}
+              historyAvailable={historyAvailable}
             />
           )}
         </div>

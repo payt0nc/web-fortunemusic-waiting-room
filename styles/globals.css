@@ -129,3 +129,17 @@ body {
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes sparkline-flash-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.sparkline-flash-halo {
+  animation: sparkline-flash-pulse 1.4s ease-in-out infinite;
+}
