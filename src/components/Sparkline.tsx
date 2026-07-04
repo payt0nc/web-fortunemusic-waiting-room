@@ -15,6 +15,32 @@ const W = 100;
 const H = 32;
 const PAD = 3;
 
+// One shared 1s ticker for every sparkline on the page, so a grid of dozens of
+// cards drives a single timer instead of one interval + re-render loop per card.
+const nowSubscribers = new Set<(now: number) => void>();
+let tickerId: ReturnType<typeof setInterval> | null = null;
+
+function useSharedNow(): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    nowSubscribers.add(setNow);
+    if (tickerId === null) {
+      tickerId = setInterval(() => {
+        const n = Date.now();
+        nowSubscribers.forEach((fn) => fn(n));
+      }, 1000);
+    }
+    return () => {
+      nowSubscribers.delete(setNow);
+      if (nowSubscribers.size === 0 && tickerId !== null) {
+        clearInterval(tickerId);
+        tickerId = null;
+      }
+    };
+  }, []);
+  return now;
+}
+
 interface Coord {
   x: number;
   y: number;
@@ -86,13 +112,8 @@ export function Sparkline({
   currentCount,
   className = '',
 }: SparklineProps) {
-  const [now, setNow] = useState(() => Date.now());
+  const now = useSharedNow();
   const fillClipId = useId();
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   const geometry = useMemo(() => {
     const startMs = sessionStart.getTime();

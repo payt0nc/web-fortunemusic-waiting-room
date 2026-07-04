@@ -3,11 +3,9 @@ import { isValid } from 'date-fns';
 import { fetchWaitingRooms, type WaitingRoom } from '@/api/fortunemusic/waitingRooms';
 import { fetchSessionHistory, historyFromSessionData } from '@/api/sessionHistory';
 import type { Event, Session } from '@/api/fortunemusic/events';
-import { historyKey, type HistoryPoint } from '@/lib/history';
+import { type HistoryPoint } from '@/lib/history';
 
 const REFRESH_INTERVAL = 10; // seconds
-
-export { historyKey } from '@/lib/history';
 
 export function useWaitingRooms(
   selectedSession: Session | null,
@@ -16,7 +14,7 @@ export function useWaitingRooms(
 ) {
   const [waitingRooms, setWaitingRooms] = useState<Map<number, WaitingRoom[]>>(new Map());
   const [history, setHistory] = useState<Map<string, HistoryPoint[]>>(new Map());
-  const [historyAvailable, setHistoryAvailable] = useState<boolean | null>(null);
+  const [historyAvailable, setHistoryAvailable] = useState<boolean>(false);
   const [participant, setParticipant] = useState<number>(0);
   const [notice, setNotice] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -100,7 +98,7 @@ export function useWaitingRooms(
   useEffect(() => {
     if (!sessionId || !eventId || !eventDateKey || loading) return;
     setHistory(new Map());
-    setHistoryAvailable(null);
+    setHistoryAvailable(false);
     loadSessionHistory(sessionId);
   }, [sessionId, eventId, eventDateKey, loading, loadSessionHistory]);
 

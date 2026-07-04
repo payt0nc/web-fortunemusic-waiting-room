@@ -19,7 +19,7 @@ interface WaitingRoomGridProps {
   waitingRooms: Map<number, WaitingRoom[]>,
   members: Map<string, Member>,
   history: Map<string, HistoryPoint[]>,
-  historyAvailable: boolean | null,
+  historyAvailable: boolean,
 }
 
 interface room {
@@ -56,7 +56,10 @@ function joinMemberWaitingRoom(
 
 
 export function WaitingRoomGrid({ currentSessionID, session, waitingRooms, members, history, historyAvailable }: WaitingRoomGridProps) {
-  const rooms: room[] = joinMemberWaitingRoom(currentSessionID, waitingRooms, members);
+  const rooms: room[] = useMemo(
+    () => joinMemberWaitingRoom(currentSessionID, waitingRooms, members),
+    [currentSessionID, waitingRooms, members],
+  );
 
   const viewEndMs = useMemo(() => {
     if (!session) return Date.now();
@@ -88,7 +91,7 @@ export function WaitingRoomGrid({ currentSessionID, session, waitingRooms, membe
         const peopleColor = getPeopleCountColors(room.waitingCount).text;
         const timeColor = getWaitingTimeColors(room.waitingTime).text;
         const samples = history.get(historyKey(currentSessionID, room.id)) ?? [];
-        const showCurve = historyAvailable === true && samples.length > 0 && session;
+        const showCurve = historyAvailable && samples.length > 0 && session;
         return (
           <li key={room.id} role="listitem" className="contents">
             <Card

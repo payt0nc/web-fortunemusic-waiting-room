@@ -41,11 +41,12 @@ export function sessionHistoryUrl(eventId: number, sessionId: number, date: Date
   return `${ASSETS_BASE}/${dateStr}/${eventId}/${sessionId}.json`;
 }
 
-function matchMember(entry: SessionHistoryMember, members: Map<string, Member>): Member | undefined {
-  const sorted = [...members.values()].sort((a, b) => a.order - b.order);
-  const byName = new Map(sorted.map((member) => [normalizeName(member.name), member]));
-  const byOrder = new Map(sorted.map((member) => [member.order, member]));
-
+function matchMember(
+  entry: SessionHistoryMember,
+  sorted: Member[],
+  byName: Map<string, Member>,
+  byOrder: Map<number, Member>,
+): Member | undefined {
   return (
     byName.get(normalizeName(entry.member_names[0] ?? '')) ??
     byOrder.get(entry.member_id) ??
@@ -74,9 +75,13 @@ export function historyFromSessionData(
 ): Map<string, HistoryPoint[]> {
   if (!members || members.size === 0) return new Map();
 
+  const sorted = [...members.values()].sort((a, b) => a.order - b.order);
+  const byName = new Map(sorted.map((member) => [normalizeName(member.name), member]));
+  const byOrder = new Map(sorted.map((member) => [member.order, member]));
+
   const result = new Map<string, HistoryPoint[]>();
   for (const entry of data.members) {
-    const member = matchMember(entry, members);
+    const member = matchMember(entry, sorted, byName, byOrder);
     if (!member) continue;
     result.set(
       historyKey(sessionId, member.ticketCode),
