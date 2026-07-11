@@ -38,3 +38,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Design tool artifacts
 *.pen
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
