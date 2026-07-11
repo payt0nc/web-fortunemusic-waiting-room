@@ -1,7 +1,7 @@
-import { isValid } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
 import type { Member } from '@/api/fortunemusic/events';
 import { historyKey, type HistoryPoint } from '@/lib/history';
+import { isValid } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 const ASSETS_BASE = 'https://assets.meet.oshi-katsu.app';
 
@@ -38,7 +38,7 @@ export function sessionHistoryUrl(eventId: number, sessionId: number, date: Date
       : isValid(date)
         ? formatInTimeZone(date, 'Asia/Tokyo', 'yyyy-MM-dd')
         : '';
-  return `${ASSETS_BASE}/${dateStr}/${eventId}/${sessionId}.json`;
+  return `${ASSETS_BASE}/queue/${dateStr}/${eventId}/${sessionId}.json`;
 }
 
 function matchMember(
