@@ -5,5 +5,19 @@ import '../../styles/globals.css';
 ---
 
 <BaseLayout>
+  <!-- ponytail: sr-only static text so crawlers see content; the app itself is a client-only island -->
+  <header class="sr-only">
+    <h1>46◢ Online Meet Waiting Room — 乃木坂46・櫻坂46・日向坂46 ミーグリ待機状況</h1>
+    <p lang="ja">
+      乃木坂46、櫻坂46、日向坂46のオンラインミート＆グリート（ミーグリ）の待機列・部屋状況をリアルタイムで確認できるダッシュボード。
+    </p>
+    <p lang="zh-Hant">
+      乃木坂46、櫻坂46、日向坂46 線上見面會（ミーグリ）狀況即時查詢。
+    </p>
+    <p>
+      Live dashboard tracking waiting room status for Nogizaka46, Sakurazaka46 and
+      Hinatazaka46 online meet &amp; greet events.
+    </p>
+  </header>
   <Dashboard client:only="react" />
 </BaseLayout>

@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://status.meet.oshi-katsu.app/sitemap-index.xml
